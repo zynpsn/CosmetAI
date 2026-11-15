@@ -105,14 +105,14 @@ footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);f
 <div id="urunKart"></div>
 
 <div class="grid">
-  <div><div id="map" aria-label="Mağaza haritası"></div><small id="haritaDurum" style="display:block;margin-top:6px;color:#6e5d73">Harita durumu: başlatılıyor…</small></div>
+  <div><div id="map" aria-label="Mağaza haritası"></div><small style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px;color:#6e5d73"><span id="haritaDurum">Harita durumu: başlatılıyor…</span><button type="button" id="googleBtn" style="padding:3px 10px;font-size:.8rem">Harita görünmüyor mu? Google Haritalar'a geç</button><button type="button" id="karoBtn" style="padding:3px 10px;font-size:.8rem">Başka harita kaynağı dene</button></small></div>
   <ul id="liste"></ul>
 </div>
 
 <footer>
   Bu bir ders projesi prototipidir. Mağaza konumları OpenStreetMap'ten canlı çekilir (kapsam eksik olabilir). Stok adetleri ise örnek (simüle) veridir; gerçek stok bilgisi değildir.
   Ürün görselleri, kendi eklediklerin dışında, Open Beauty Facts açık veritabanından (CC BY-SA lisansı) gelir; resmi olmayan ürünlerde harf/renk kutusu gösterilir. Listede olmayan ürünler de serbest metinle aranabilir; ürün önerileri ayrıca Open Beauty Facts açık veritabanından gelir. Gerçek kullanımda stok verisi zincirlerle resmi iş birliği veya kullanıcı bildirimleri ile sağlanır.
-  <br><b>Sürüm: H3 (harita: önce Google Haritalar)</b>
+  <br><b>Sürüm: H4 (CARTO kaldırıldı)</b>
 </footer>
 </div>
 
@@ -871,8 +871,9 @@ function gomuluHarita(lat, lng, z){
 gomuluHarita(39, 35, 5);
 hDurum("Google Haritalar gösteriliyor, ayrıntılı harita hazırlanıyor…");
 const KARO_KAYNAKLARI = [
-  {ad:"CARTO", url:"https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", sec:{subdomains:"abcd", maxZoom:19, attribution:"© OpenStreetMap katkıcıları © CARTO"}},
-  {ad:"OpenStreetMap", url:"https://tile.openstreetmap.org/{z}/{x}/{y}.png", sec:{maxZoom:19, attribution:"© OpenStreetMap katkıcıları"}}
+  {ad:"OpenStreetMap", url:"https://tile.openstreetmap.org/{z}/{x}/{y}.png", sec:{maxZoom:19, attribution:"© OpenStreetMap katkıcıları"}},
+  {ad:"Esri", url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", sec:{maxZoom:19, attribution:"Tiles © Esri"}},
+  {ad:"OpenStreetMap HOT", url:"https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", sec:{subdomains:"abc", maxZoom:19, attribution:"© OpenStreetMap katkıcıları, HOT"}}
 ];
 let konum = null;        // {lat, lng, gercek}
 let HARITA_YOK = false, lh = null, karo = null, katman = null, LEAFLET_ACIK = false;
@@ -942,6 +943,7 @@ if (typeof L === "undefined" || !L.map) {
       });
     };
     karoKur();
+    window.sonrakiKaro = () => { sira = (sira + 1) % KARO_KAYNAKLARI.length; LEAFLET_ACIK = false; karoKur(); hDurum(KARO_KAYNAKLARI[sira].ad + " deneniyor…"); };
     setTimeout(() => { if (!LEAFLET_ACIK && sira < KARO_KAYNAKLARI.length - 1) { sira++; karoKur(); } }, 5000);
     setTimeout(() => { if (!LEAFLET_ACIK) googleYedegineGec("harita görüntüleri gelmedi"); }, 10000);
     katman = L.layerGroup().addTo(lh);
@@ -954,6 +956,8 @@ if (typeof L === "undefined" || !L.map) {
   }
 }
 
+document.getElementById("googleBtn").onclick = () => { HARITA_YOK ? hDurum("Google Haritalar zaten kullanılıyor.") : googleYedegineGec("elle seçildi"); };
+document.getElementById("karoBtn").onclick = () => { if (!HARITA_YOK && window.sonrakiKaro) window.sonrakiKaro(); else hDurum("Ayrıntılı harita yüklenemedi, Google Haritalar kullanılıyor."); };
 let magazalar = null;    // o konum için yüklenen mağazalar
 let kaynak = "";         // "osm" | "ornek"
 let seciliUrun = null;
