@@ -112,6 +112,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);f
 <footer>
   Bu bir ders projesi prototipidir. Mağaza konumları OpenStreetMap'ten canlı çekilir (kapsam eksik olabilir). Stok adetleri ise örnek (simüle) veridir; gerçek stok bilgisi değildir.
   Ürün görselleri, kendi eklediklerin dışında, Open Beauty Facts açık veritabanından (CC BY-SA lisansı) gelir; resmi olmayan ürünlerde harf/renk kutusu gösterilir. Listede olmayan ürünler de serbest metinle aranabilir; ürün önerileri ayrıca Open Beauty Facts açık veritabanından gelir. Gerçek kullanımda stok verisi zincirlerle resmi iş birliği veya kullanıcı bildirimleri ile sağlanır.
+  <br><b>Sürüm: H3 (harita: önce Google Haritalar)</b>
 </footer>
 </div>
 
@@ -854,82 +855,97 @@ function km(a, b){
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 /* ---- HARİTA ----
-   1) Leaflet + CARTO karoları   2) olmazsa OpenStreetMap karoları
-   3) Leaflet yüklenemezse ya da 12 sn içinde hiçbir karo gelmezse Google Haritalar gömülü görünümü.
-   Haritanın altındaki #haritaDurum satırı neyin çalışıp neyin çalışmadığını yazar. */
+   Sayfa açılır açılmaz Google Haritalar görünümü gösterilir (hiçbir kütüphane gerektirmez).
+   Arka planda Leaflet haritası hazırlanır; ilk harita görüntüsü gerçekten yüklendiğinde
+   Leaflet görünür olur (mağazalar renkli işaretlerle gösterilir). Yüklenemezse Google Haritalar kalır. */
 const MAP_EL = document.getElementById("map");
+MAP_EL.style.position = "relative"; MAP_EL.style.overflow = "hidden";
+MAP_EL.innerHTML = '<iframe id="gmap" title="Mağaza haritası" style="position:absolute;inset:0;width:100%;height:100%;border:0;display:block" referrerpolicy="no-referrer-when-downgrade"></iframe><div id="lmap" style="position:absolute;inset:0;visibility:hidden"></div>';
+const GMAP = document.getElementById("gmap"), LMAP = document.getElementById("lmap");
 const H_DURUM = document.getElementById("haritaDurum");
 const hDurum = t => { if (H_DURUM) H_DURUM.textContent = "Harita durumu: " + t; };
+function gomuluHarita(lat, lng, z){
+  const src = "https://maps.google.com/maps?q=" + lat + "," + lng + "&z=" + z + "&hl=tr&output=embed";
+  if (GMAP.src !== src) GMAP.src = src;
+}
+gomuluHarita(39, 35, 5);
+hDurum("Google Haritalar gösteriliyor, ayrıntılı harita hazırlanıyor…");
 const KARO_KAYNAKLARI = [
   {ad:"CARTO", url:"https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", sec:{subdomains:"abcd", maxZoom:19, attribution:"© OpenStreetMap katkıcıları © CARTO"}},
   {ad:"OpenStreetMap", url:"https://tile.openstreetmap.org/{z}/{x}/{y}.png", sec:{maxZoom:19, attribution:"© OpenStreetMap katkıcıları"}}
 ];
-function gomuluHarita(lat, lng, z){
-  MAP_EL.className = ""; MAP_EL.removeAttribute("style");
-  MAP_EL.innerHTML = '<iframe title="Mağaza haritası" style="width:100%;height:100%;border:0;border-radius:14px;display:block" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=' + lat + ',' + lng + '&z=' + z + '&hl=tr&output=embed"></iframe>';
-}
 let konum = null;        // {lat, lng, gercek}
-let HARITA_YOK = false, harita = null, karo = null, katman = null;
-/* Google Haritalar yedeğine geç: aynı fonksiyon adlarını taklit eden küçük bir nesne */
+let HARITA_YOK = false, lh = null, karo = null, katman = null, LEAFLET_ACIK = false;
+/* Sitenin geri kalanı sadece bu nesneyi kullanır: komutlar hem Google görünümüne hem (varsa) Leaflet'e gider */
+const harita = {
+  setView(m, z){ googleHarita.setView(m, z); if (lh && !HARITA_YOK) lh.setView(m, z); return this; },
+  fitBounds(n, o){ googleHarita.fitBounds(n); if (lh && !HARITA_YOK) lh.fitBounds(n, o); return this; },
+  invalidateSize(){ if (lh && !HARITA_YOK) lh.invalidateSize(); }
+};
+/* Google Haritalar modunda kullanılan, Leaflet ile aynı adlı küçük nesne */
+const googleHarita = {
+  setView(m, z){ gomuluHarita(m[0], m[1], z || 14); return this; },
+  fitBounds(noktalar){
+    if (!noktalar || !noktalar.length) return this;
+    const n = konum ? [konum.lat, konum.lng] : noktalar[0];
+    gomuluHarita(n[0], n[1], 13); return this;
+  },
+  invalidateSize(){}, removeLayer(){}, remove(){}
+};
 function googleYedegineGec(neden){
   if (HARITA_YOK) return;
-  HARITA_YOK = true;
-  try { if (harita && harita.remove) harita.remove(); } catch (e) {}
+  HARITA_YOK = true; LEAFLET_ACIK = false;
+  try { if (lh) lh.remove(); } catch (e) {}
+  lh = null;
+  LMAP.style.visibility = "hidden"; GMAP.style.display = "block";
   const isaret = () => ({addTo(){ return this; }, bindPopup(){ return this; }, bindTooltip(){ return this; }, openPopup(){}});
   const grup = () => ({addTo(){ return this; }, clearLayers(){}});
   window.L = {circleMarker:isaret, marker:isaret, layerGroup:grup};
   katman = grup();
-  harita = {
-    setView(m, z){ gomuluHarita(m[0], m[1], z || 14); return this; },
-    fitBounds(noktalar){
-      if (!noktalar || !noktalar.length) return this;
-      const n = konum ? [konum.lat, konum.lng] : noktalar[0];
-      gomuluHarita(n[0], n[1], 13); return this;
-    },
-    invalidateSize(){}, removeLayer(){}, remove(){}
-  };
-  const n = konum ? konum : {lat:39, lng:35};
-  gomuluHarita(n.lat, n.lng, konum ? 13 : 5);
+  if (konum) gomuluHarita(konum.lat, konum.lng, 13);
   hDurum("Google Haritalar kullanılıyor (" + neden + ").");
 }
-/* Leaflet'in görünüm dosyası (CSS) yüklenmediyse yedek adresten yükle */
+function leafletiGoster(ad){
+  if (LEAFLET_ACIK || HARITA_YOK) return;
+  LEAFLET_ACIK = true;
+  LMAP.style.visibility = "visible"; GMAP.style.display = "none";
+  lh.invalidateSize();
+  hDurum(ad + " haritası çalışıyor.");
+}
 function leafletCssKontrol(){
-  const pane = MAP_EL.querySelector(".leaflet-pane");
+  const pane = LMAP.querySelector(".leaflet-pane");
   if (pane && getComputedStyle(pane).position !== "absolute") {
     const l = document.createElement("link"); l.rel = "stylesheet";
     l.href = "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css";
     document.head.appendChild(l);
-    return false;
   }
-  return true;
 }
 if (typeof L === "undefined" || !L.map) {
   googleYedegineGec("harita kütüphanesi yüklenemedi");
 } else {
   try {
-    harita = L.map(MAP_EL, {zoomControl:true}).setView([39, 35], 6);
-    const cssVar = leafletCssKontrol();
-    let sira = 0, hata = 0, yuklenen = 0;
+    lh = L.map(LMAP, {zoomControl:true}).setView([39, 35], 6);
+    leafletCssKontrol();
+    let sira = 0, hata = 0;
     const karoKur = () => {
       if (HARITA_YOK) return;
-      if (karo) harita.removeLayer(karo);
+      if (karo) lh.removeLayer(karo);
       const k = KARO_KAYNAKLARI[sira];
-      karo = L.tileLayer(k.url, k.sec).addTo(harita);
+      karo = L.tileLayer(k.url, k.sec).addTo(lh);
       hata = 0;
-      hDurum(k.ad + " harita görüntüleri yükleniyor…" + (cssVar ? "" : " (görünüm dosyası yedekten yüklendi)"));
-      karo.on("tileload", () => { yuklenen++; hDurum(k.ad + " çalışıyor."); });
+      karo.on("tileload", () => leafletiGoster(k.ad));
       karo.on("tileerror", () => {
-        if (++hata === 3) {
+        if (++hata === 3 && !LEAFLET_ACIK) {
           if (sira < KARO_KAYNAKLARI.length - 1) { sira++; karoKur(); }
-          else if (!yuklenen) googleYedegineGec("harita görüntüleri engellendi");
+          else googleYedegineGec("harita görüntüleri engellendi");
         }
       });
     };
     karoKur();
-    setTimeout(() => { if (!yuklenen && sira < KARO_KAYNAKLARI.length - 1) { sira++; karoKur(); } }, 6000);
-    setTimeout(() => { if (!yuklenen) googleYedegineGec("harita görüntüleri 12 saniyede gelmedi"); }, 12000);
-    katman = L.layerGroup().addTo(harita);
-    const boyutla = () => { if (!HARITA_YOK) harita.invalidateSize(); };
+    setTimeout(() => { if (!LEAFLET_ACIK && sira < KARO_KAYNAKLARI.length - 1) { sira++; karoKur(); } }, 5000);
+    setTimeout(() => { if (!LEAFLET_ACIK) googleYedegineGec("harita görüntüleri gelmedi"); }, 10000);
+    katman = L.layerGroup().addTo(lh);
+    const boyutla = () => { if (lh && !HARITA_YOK) lh.invalidateSize(); };
     setTimeout(boyutla, 300); window.addEventListener("load", boyutla);
     if (window.ResizeObserver) new ResizeObserver(boyutla).observe(MAP_EL);
   } catch (e) {
