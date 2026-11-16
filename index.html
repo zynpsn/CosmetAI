@@ -268,7 +268,8 @@ const ESANLAM = {lipstick:["ruj"], lip:["dudak","ruj"], gloss:["parlatıcı"], l
   fondöten:["foundation","fondoten","skin tint"], kapatıcı:["concealer","kapatici"], allık:["blush","allik"], pudra:["powder"],
   parlatıcı:["gloss","parlatici"], aydınlatıcı:["highlighter","glow"], oje:["nail","lacquer"], kaş:["brow"], dudak:["lip"],
   far:["eyeshadow","shadow","palet"], kalem:["pencil","liner","kalemi"], eyeliner:["liner"], şampuan:["shampoo"], krem:["cream","creme"]};
-const icerir = (ad, w) => ad.includes(w) || (ESANLAM[w] || []).some(x => ad.includes(x));
+let _esn = null;   /* eşanlamlar da aramadaki gibi sadeleştirilir (ı/i, büyük/küçük harf) */
+const icerir = (ad, w) => { if (!_esn) { _esn = {}; Object.entries(ESANLAM).forEach(([k, v]) => { _esn[norm(k)] = v.map(norm); }); } return ad.includes(w) || (_esn[w] || []).some(x => ad.includes(x)); };
 function dilUygula(){
   document.documentElement.lang = DIL;
   document.title = T("sayfaBaslik");
@@ -582,6 +583,88 @@ Flormar | Sheer Up Ruj 019 Mystic Rose | | |
 Flormar | Sheer Up Ruj 022 Daring Whisper | | |
 Flormar | Sheer Up Ruj 023 Candy Crush | | |
 Flormar | Sheer Up Intense Ruj | | |
+Isana | Hyaluron Intense Yüz Bakım Serumu 30 ml | | |
+Isana | Hyaluron Intense Gündüz Kremi SPF 30 50 ml | | |
+Isana | Hyaluron Intense Gece Kremi 50 ml | | |
+Isana | Hyaluron Intense Göz Kremi 15 ml | | |
+Isana | Power Serum Hyaluron Shot 10 ml | | |
+Isana | Intensiv Serum %10 C Vitamini 30 ml | | |
+Isana | Kapsül Serum Vitamin C ve Maracuja Yağı 7x0,38 ml | | |
+Isana | Love Your Skin Serum Niacinamid 30 ml | | |
+Isana | Love Your Skin Serum Peptit Kolajen 30 ml | | |
+Isana | Love Your Skin Yüz Temizleme Jeli AHA PHA 125 ml | | |
+Isana | Love Your Skin Yüz Temizleme Balmı 100 ml | | |
+Isana | Night & Beauty Yüz Serumu Gece 30 ml | | |
+Isana | Pure Nemlendirici Krem 24H Niacinamide 50 ml | | |
+Isana | Pure Yüz Yıkama Köpüğü Niacinamide 150 ml | | |
+Isana | Hydro Booster Nemlendirici Jel Krem 50 ml | | |
+Isana | Korean Skincare Nemlendirici Krem Cica & Panthenol 50 ml | | |
+Isana | Yüz Temizleme Yağı Parfümsüz 100 ml | | |
+Isana | El Kremi Çok Kuru Cilt %5 Üre 100 ml | | |
+Isana | El Kremi Onarıcı & Hızlı Emilen 100 ml | | |
+Isana | El ve Tırnak Kremi Aloe Vera 100 ml | | |
+Isana | Tüp El Kremi Night & Beauty 100 ml | | |
+Isana | Eldiven El Maskesi Üre | | |
+Isana | Vücut Losyonu Parfum & Glow 200 ml | | |
+Isana | Vücut Losyonu %5 Üre 300 ml | | |
+Isana | Vücut Losyonu Sıkılaştırıcı Q10 C Vitamini 300 ml | | |
+Isana | Kavanoz Vücut Kremi %5 Üre ve Cica 400 ml | | |
+Isana | Vücut Kremi Shea ve Kakao Yağlı 500 ml | | |
+Isana | Vücut Kremi Kavanoz Floral Blossom 500 ml | | |
+Isana | Vücut Bakım Yağı Spreyi Q10 150 ml | | |
+Isana | Vazelin Parfümsüz Tüp 75 ml | | |
+Isana | Deodorant Krem 50 ml | | |
+Isana | Duş Jeli Üre Kremsi 250 ml | | |
+Isana | Duşta Bakım Jeli Creme & Care 300 ml | | |
+Isana | Kremsi Duş Jeli Süt & Bal 300 ml | | |
+Isana | Kremsi Duş Jeli İnci Özlü 300 ml | | |
+Isana | Kremsi Duş Jeli Sweet Blueberry 300 ml | | |
+Isana | Duş Jeli Coco Lagoon Kremsi 300 ml | | |
+Isana | Kremsi Duş Jeli Badem Yağı 750 ml | | |
+Isana | Kremsi Duş Jeli Hindistan Cevizi & Vanilya 750 ml | | |
+Isana | Duş Jeli Doğayı Sev Argan Yağı 250 ml | | |
+Isana | Şampuan Nemlendirici 300 ml | | |
+Isana | Şampuan İpeksi Parlaklık Manolya ve Lotus 300 ml | | |
+Isana | Saç Kremi İpeksi Parlaklık Manolya ve Lotus 300 ml | | |
+Isana | Kadınlara Özel Şampuan Kafein Aktif 250 ml | | |
+Isana | Saç Bakım Kürü Argan Yağı 25 ml | | |
+Isana | Oje Çıkarıcı Badem Kokulu 125 ml | | |
+Isana | Kulak Çubuğu 300 Adet | | |
+Isana | Med Duş Jeli %5 Üre Nemlendirici 250 ml | | |
+Isana | Med Duş Jeli Ultra Hassas Ciltler 250 ml | | |
+Isana | Med Sıvı Sabun Sensitive 300 ml | | |
+Isana | Med Vücut Sütü %10 Üre 250 ml | | |
+Isana | Med Nemlendirici El Kremi %5,5 Üre & Cica 100 ml | | |
+Isana | Med Yüz Kremi Intensive Üre 50 ml | | |
+Isana | Med Serum %5 Üre Akut Nemlendirici 100 ml | | |
+Isana | Med Şampuan Ölü Deniz Tuzu 200 ml | | |
+Isana | Men Şampuan Kafein ve Keratin 300 ml | | |
+Isana | Men Şampuan Fresh Power 300 ml | | |
+Isana | Men Ekstra Hacim Veren Şampuan 300 ml | | |
+Isana | Men Duş Jeli 3in1 Energy 300 ml | | |
+Isana | Men Deodorant Active Cool Fresh 150 ml | | |
+Isana | Men Deodorant Motion Protect 150 ml | | |
+Isana | Men Deodorant Fresh 150 ml | | |
+Isana | Men Deo Roll On Active Cool 50 ml | | |
+Isana | Men Ultra Hassas Yüz Yıkama Jeli 150 ml | | |
+Isana | Men Tıraş Köpüğü Hassas Ciltler İçin 300 ml | | |
+Isana | Men Tıraş Köpüğü Aloe Vera'lı 300 ml | | |
+Isana | Men Tıraş Bıçağı 6 Jiletli | | |
+Isana | Men Tıraş Bıçağı 3 Bıçaklı 8 Adet | | |
+Isana | Kids Kolay Tarama Şampuanı Meyveli Koku 300 ml | | |
+Isana | Kids Kolay Saç Tarama Spreyi Meyveli Koku 150 ml | | |
+Isana | Kids Duş Jeli Parıltılı Meyvemsi 300 ml | | |
+Isana | Kids Duş Köpüğü Çilek Kokulu 50 ml | | |
+Isana | Professional Argan Yağı Şampuan 250 ml | | |
+Isana | Professional Argan Yağı Saç Kremi 200 ml | | |
+Isana | Professional Argan Yağı Saç Maskesi 250 ml | | |
+Isana | Professional Argan Yağı Saç Bakım Yağı 100 ml | | |
+Isana | Professional Güçlü Bukleler Şampuan 250 ml | | |
+Isana | Professional Güçlü Bukleler Saç Kremi 200 ml | | |
+Isana | Professional Güçlü Bukleler Şekillendirici Krem 150 ml | | |
+Isana | Professional Gümüş ve Parlak Şampuan 250 ml | | |
+Isana | Professional Kahverengi ve Parlak Saç Kremi 200 ml | | |
+Isana | Professional Plex Kuru Şampuan 200 ml | | |
 Pastel | Daylong Lipcolor Kissproof Likit Ruj 9 So Red | | |
 Pastel | Daylong Lipcolor Kissproof Likit Ruj 17 Dust Rose | | |
 Pastel | Daylong Lipcolor Kissproof Likit Ruj 19 Ruby | | |
@@ -1873,7 +1956,7 @@ async function osmMagazalar(lat, lng, r){
 
 /* ========== 5) YARDIMCILAR ========== */
 const $ = id => document.getElementById(id);
-const norm = s => s.toLocaleLowerCase("tr").replace(/[^\p{L}\p{N} ]/gu, " ").replace(/\s+/g, " ").trim();
+const norm = s => s.toLocaleLowerCase("tr").replace(/ı/g, "i").replace(/[^\p{L}\p{N} ]/gu, " ").replace(/\s+/g, " ").trim();
 const tamAd = u => u.tam || (u.marka + " " + u.ad);
 function km(a, b){
   const R = 6371, rad = Math.PI / 180;
