@@ -1391,6 +1391,7 @@ async function tomtomMagazalar(lat, lng){
       const re = ZINCIR.find(([z]) => z === zincir)[1];
       (v.results || []).forEach(r => {
         const ad = (r.poi && r.poi.name) || "";
+        if (r.type !== "POI" || /otopark|park yeri|sokak|sokağı|cadde|bulvar|durak|eczane/i.test(ad)) return;
         if (!r.position || !re.test(ad) || /collection/i.test(ad)) return;
         const la = r.position.lat, lo = r.position.lon, anahtar = zincir + la.toFixed(3) + lo.toFixed(3);
         if (gorulen.has(anahtar)) return; gorulen.add(anahtar);
@@ -1445,6 +1446,7 @@ async function nominatimMagazalar(lat, lng){
       if (!res.ok) throw new Error("HTTP " + res.status);
       (await res.json()).forEach(e => {
         const ad = e.name || (e.display_name || "").split(",")[0];
+        if (e.category !== "shop") return;
         const re = ZINCIR.find(([z]) => z === zincir)[1];
         if (!re.test(ad) || /collection/i.test(ad)) return;
         const la = +e.lat, lo = +e.lon, anahtar = zincir + la.toFixed(3) + lo.toFixed(3);
