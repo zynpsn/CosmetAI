@@ -29,7 +29,7 @@ Bir ürünü sosyal medyada görüp denemek istediğimizde çoğu zaman mağaza 
 | Arayüz | HTML, CSS, JavaScript (tek dosya, kurulum gerektirmez) |
 | Harita | [Leaflet](https://leafletjs.com/), yedek olarak Google Haritalar |
 | Mağaza konumları | [OpenStreetMap](https://www.openstreetmap.org/) (Overpass API, Nominatim) ve [TomTom Search API](https://developer.tomtom.com/) |
-| Ürün önerileri ve barkod | [Open Beauty Facts](https://world.openbeautyfacts.org/) (CC BY-SA) |
+| Ürün önerileri | [Open Beauty Facts](https://world.openbeautyfacts.org/) (CC BY-SA) |
 | Yayın | GitHub Pages |
 
 ## Sınırlamalar
