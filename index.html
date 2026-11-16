@@ -106,7 +106,6 @@ footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);f
   <form id="ekleForm">
     <input name="marka" placeholder="Marka (örn. Sheglam)" data-i18n-ph="markaPh" required>
     <input name="ad" placeholder="Ürün adı ve ton (örn. Starlight Velvet Ruj 407 Flame)" data-i18n-ph="adPh" required>
-    <input name="barkod" inputmode="numeric" placeholder="Barkod (isteğe bağlı, 8-14 rakam)" data-i18n-ph="barkodPh">
     <label class="renkSec"><span data-i18n="renkEt">Renk</span> <input type="color" name="renk" value="#b3124f"> <span><input type="checkbox" name="renkVar"> <span data-i18n="renkEkle">renk ekle</span></span></label>
     <button data-i18n="ekleBtn">Ekle</button>
   </form>
@@ -195,7 +194,7 @@ const SOZLUK = {
   renkRozet:{tr:"Renk ", en:"Colour "}, barkodRozet:{tr:"Barkod: ", en:"Barcode: "},
   barkodAraniyor:{tr:"Barkod aranıyor...", en:"Looking up barcode..."},
   barkodYok:{tr:"Bu barkod ürün veritabanında bulunamadı. Ürün adıyla aramayı dene veya aşağıdan kendin ekle.", en:"This barcode is not in the product database. Try searching by name or add it yourself below."},
-  bosArama:{tr:"Lütfen bir ürün adı veya barkod yaz.", en:"Please type a product name or barcode."},
+  bosArama:{tr:"Lütfen bir ürün adı yaz.", en:"Please type a product name."},
   urunBulundu:{tr:"{n} ürün bulundu, birini seç:", en:"{n} products found, pick one:"},
   urunYok:{tr:"Listemizde bu ürün yok. Yazdığın adla yine de aratabilir veya ürün veritabanından seçebilirsin:", en:"This product is not in our list. You can still search with the name you typed or pick one from the product database:"},
   olarakAra:{tr:"“{q}” olarak ara", en:"Search for “{q}”"},
@@ -1786,11 +1785,6 @@ async function ara(){
   const q0 = $("q").value.trim(), q = norm(q0), no = ++aramaNo;
   $("secim").innerHTML = "";
   if (!q) { $("durum").textContent = T("bosArama"); return; }
-  if (/^\d{8,14}$/.test(q0)) {
-    const yerel = URUNLER.find(u => u.barkod === q0);
-    if (yerel) { $("q").value = gorunenAd(tamAd(yerel)); await goster(yerel); return; }
-    await barkodAra(q0, no); return;
-  }
   const kelimeler = q.split(" ");
   const bulunan = URUNLER.filter(u => { const a = norm(tamAd(u)); return kelimeler.every(k => icerir(a, k)); });
   const tam = bulunan.find(u => norm(tamAd(u)) === q);
