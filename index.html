@@ -1,6 +1,2304 @@
 <!DOCTYPE html>
 <html lang="tr">
+<head><!DOCTYPE html>
+<html lang="tr">
 <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CosmetAI</title>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta name="description" content="CosmetAI: Aradığın kozmetik ürünün Gratis, Watsons, Rossmann, Sephora, Eve ve markaların kendi mağazalarında nerede olduğunu konumuna göre gör. Türkiye'nin 81 ili.">
+<meta name="theme-color" content="#b3124f">
+<meta property="og:type" content="website">
+<meta property="og:title" content="CosmetAI">
+<meta property="og:description" content="Aradığın kozmetik ürün yakınındaki hangi mağazada var? Gratis, Watsons, Rossmann, Sephora ve Eve mağazalarını konumuna göre gösterir.">
+<meta property="og:url" content="https://zynpsn.github.io/CosmetAI/">
+<meta property="og:image" content="https://zynpsn.github.io/CosmetAI/paylasim.png">
+<meta name="twitter:card" content="summary_large_image">
+<script>(function(){var t="auto";try{t=localStorage.getItem("tema")||"auto";}catch(e){}
+var koyu=t==="dark"||(t==="auto"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);
+document.documentElement.setAttribute("data-theme",koyu?"dark":"light");})();</script>
+<script>window.addEventListener("error",function(e){var d=document.getElementById("haritaDurum");if(d&&e.message)d.textContent=(document.documentElement.lang==="en"?"Page error: ":"Sayfa hatası: ")+e.message+" (satır "+e.lineno+")";});</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap">
+<style>
+:root{--ink:#2a1a2e;--muted:#6e5d73;--bg:#fbf5f6;--card:#fff;--line:#ecdde1;--lip:#b3124f;--lipHover:#97103f;--ok:#237a55;--low:#c97a14;--out:#8b8190;--field:#fff;--soft:#f1e3e8;--hover:#f4e8eb;--mapbg:#e9dde0;color-scheme:light}
+:root[data-theme="dark"]{--ink:#f3e9ee;--muted:#b6a7ba;--bg:#16101a;--card:#211925;--line:#3b2f41;--lip:#e2457f;--lipHover:#c8336b;--ok:#4cc58f;--low:#eaa64e;--out:#a196a6;--field:#1c1520;--soft:#2c2231;--hover:#2c2231;--mapbg:#2a2030;color-scheme:dark}
+:root[data-theme="dark"] .leaflet-tile{filter:brightness(.82) contrast(1.05)}
+:root[data-theme="dark"] .leaflet-popup-content-wrapper,:root[data-theme="dark"] .leaflet-popup-tip{background:var(--card);color:var(--ink)}
+.ust{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;padding-top:14px}
+.ust label{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.9rem}
+.ust select{padding:6px 10px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1{font-family:"Bricolage Grotesque",system-ui,sans-serif;margin:0;line-height:1.1;font-size:clamp(2.1rem,6vw,3.6rem);font-weight:800;letter-spacing:-.02em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+header{padding:44px 0 22px}
+header p{margin:10px 0 0;color:var(--muted);max-width:56ch;font-size:1.05rem}
+.search{display:flex;gap:8px;flex-wrap:wrap;background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:8px}
+.search input[type=text]{flex:1 1 260px;border:0;font:inherit;font-size:1.1rem;padding:12px;background:transparent;color:var(--ink);min-width:0}
+.search input:focus{outline:none}
+.search:focus-within{box-shadow:0 0 0 4px #b3124f33}
+button{font:inherit;font-weight:600;border-radius:10px;border:0;padding:12px 18px;cursor:pointer;background:var(--lip);color:#fff}
+button:hover{background:var(--lipHover)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+button.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+button.ghost:hover{background:var(--hover)}
+select{font:inherit;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--field);color:var(--ink)}
+.opts{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:14px 0 4px;color:var(--muted);font-size:.95rem}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px}
+.chip{background:var(--field);color:var(--ink);border:1.5px solid var(--line);font-weight:500;padding:8px 14px}
+.chip:hover{border-color:var(--lip);background:var(--field)}
+#durum{min-height:1.6em;margin:10px 0 2px}
+#kaynak{margin:0 0 12px;color:var(--muted);font-size:.88rem}
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;margin-bottom:28px}
+#map{height:540px;border-radius:14px;border:1px solid var(--line);background:var(--mapbg)}
+#liste{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;max-height:540px;overflow:auto}
+.m{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--out);border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 12px;cursor:pointer}
+.m:hover{border-color:var(--lip)}
+.m.ok{border-left-color:var(--ok)}.m.low{border-left-color:var(--low)}
+.m small{color:var(--muted)}
+.adet{grid-row:1/3;grid-column:2;text-align:right;font-weight:800;font-size:1.5rem;line-height:1;align-self:center}
+.adet span{display:block;font-size:.72rem;font-weight:500;color:var(--muted);margin-top:4px}
+.ok .adet{color:var(--ok)}.low .adet{color:var(--low)}.m:not(.ok):not(.low) .adet{color:var(--out)}
+#liste a,.m a{color:var(--lip)}
+#urunKart{display:flex;gap:14px;align-items:center;margin:6px 0 14px}
+#urunKart:empty{display:none}
+#urunKart small{display:block;color:var(--muted)}
+.gorsel{width:76px;height:76px;flex:none;border-radius:12px;border:1px solid var(--line);background:var(--soft);overflow:hidden;display:flex;align-items:center;justify-content:center;font:800 1.7rem "Bricolage Grotesque",system-ui,sans-serif;color:var(--ink)}
+.gorsel img{width:100%;height:100%;object-fit:contain;background:#fff}
+.chip{display:inline-flex;align-items:center;gap:8px}
+#ekle{margin:6px 0 10px;color:var(--muted)}
+#ekle summary{cursor:pointer;font-weight:600;color:var(--ink)}
+#ekleForm{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:10px 0}
+#ekleForm input{font:inherit;padding:10px;border:1.5px solid var(--line);border-radius:10px;background:var(--field);color:var(--ink);min-width:0}
+.renkSec{display:flex;align-items:center;gap:8px;font-size:.95rem}
+.renkSec input[type=color]{width:42px;height:34px;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--field)}
+#topluMetin{width:100%;font:inherit;padding:10px;border:1.5px solid var(--line);border-radius:10px;background:var(--field);color:var(--ink)}
+.topluSatir{display:flex;gap:10px;align-items:center;margin:8px 0;flex-wrap:wrap}
+.ghostLbl{cursor:pointer;border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--ink)}
+.rozet{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin-right:10px}
+.rozet i{width:14px;height:14px;border-radius:50%;border:1px solid #0003;display:inline-block}
+#ekSatir{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-all}
+footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);font-size:.9rem}
+@media(max-width:820px){.grid{grid-template-columns:1fr}#map{height:340px}#liste{max-height:none}}
+.marka{display:flex;align-items:center;gap:14px}
+.marka .logo{height:clamp(56px,10vw,88px);width:auto;flex:none}
+  <ol class="adimlar"><li data-i18n="adim1">Ürünü yaz (marka, ürün ve ton)</li><li data-i18n="adim2">Konumunu paylaş ya da ilini seç</li><li data-i18n="adim3">Yakındaki mağazaları haritada gör</li></ol>
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="ust">
+  <label><span data-i18n="temaEt">Tema</span> <select id="temaSec">
+    <option value="auto" data-i18n="temaAuto">Otomatik</option><option value="light" data-i18n="temaLight">Açık</option><option value="dark" data-i18n="temaDark">Koyu</option>
+  </select></label>
+  <label><span data-i18n="dilEt">Dil</span> <select id="dilSec"><option value="tr">Türkçe</option><option value="en">English</option></select></label>
+</div>
+<header>
+  <div class="marka"><img src="cosmetai-ikon.png" alt="" class="logo"><h1 data-i18n="baslik">CosmetAI</h1></div>
+  <p data-i18n="altBaslik">Türkiye'nin 81 ilinde, aradığın kozmetik ürünün Gratis, Watsons, Rossmann, Sephora, Eve ve markaların kendi mağazalarında kaç adet olduğunu konumuna göre gör.</p>
+</header>
+  <ol class="adimlar"><li data-i18n="adim1">Ürünü yaz (marka, ürün ve ton)</li><li data-i18n="adim2">Konumunu paylaş ya da ilini seç</li><li data-i18n="adim3">Yakındaki mağazaları haritada gör</li></ol>
+
+<div class="search" role="search">
+  <input type="text" id="q" placeholder="Örn: Sheglam rimel, Sephora Collection ruj" data-i18n-ph="araPh" autocomplete="off" aria-label="Ürün adı" data-i18n-aria="araAria">
+  <button id="ara" data-i18n="araBtn">Ara</button>
+  <button id="konum" class="ghost" data-i18n="konumBtn">Konumumu kullan</button>
+</div>
+<div class="opts">
+  <label><input type="checkbox" id="sadece"> <span data-i18n="sadece">Sadece stokta olanlar</span></label>
+  <label><span data-i18n="ilEt">Konum izni yoksa il seç:</span> <select id="il"><option value="" data-i18n="ilSec">İl seç</option></select></label>
+</div>
+<div id="secim" class="chips"></div>
+<details id="ekle">
+  <summary data-i18n="ekleSum">Aradığın ürün yok mu? Kendin ekle (tek tek veya toplu)</summary>
+  <form id="ekleForm">
+    <input name="marka" placeholder="Marka (örn. Sheglam)" data-i18n-ph="markaPh" required>
+    <input name="ad" placeholder="Ürün adı ve ton (örn. Starlight Velvet Ruj 407 Flame)" data-i18n-ph="adPh" required>
+    <label class="renkSec"><span data-i18n="renkEt">Renk</span> <input type="color" name="renk" value="#b3124f"> <span><input type="checkbox" name="renkVar"> <span data-i18n="renkEkle">renk ekle</span></span></label>
+    <button data-i18n="ekleBtn">Ekle</button>
+  </form>
+  <p data-i18n-html="topluAciklama"><b>Toplu ekle:</b> Her satıra bir ürün yaz: <code>Marka | Ürün adı | Barkod | Renk | Resim</code> (barkod, renk, resim boş olabilir). Excel'den kopyaladığın tabloyu da yapıştırabilirsin.</p>
+  <textarea id="topluMetin" rows="5" placeholder="Sheglam | Starlight Velvet Ruj 407 Flame | 8681234567890 | #c0392b | gorseller/sheglam-407.jpg"></textarea>
+  <div class="topluSatir"><button type="button" id="topluBtn" data-i18n="topluBtn">İçe aktar</button> <label class="ghostLbl"><span data-i18n="dosyaSec">veya dosya seç (.csv / .txt)</span> <input type="file" id="topluDosya" accept=".csv,.txt,text/plain,text/csv" hidden></label></div>
+  <small data-i18n-html="ekleNot">Eklediklerin sadece bu cihazda, tarayıcında saklanır. Herkes için kalıcı olması için aşağıdaki satırları koddaki <code>EK_URUNLER</code> bölümüne yapıştır.</small>
+  <pre id="ekSatir" hidden></pre>
+</details>
+<p id="durum" aria-live="polite"></p>
+<p id="kaynak"></p>
+
+<div id="urunKart"></div>
+
+<div class="grid">
+  <div><div id="map" aria-label="Mağaza haritası"></div><small style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px;color:var(--muted)"><span id="haritaDurum">Harita durumu: başlatılıyor…</span><button type="button" id="googleBtn" style="padding:3px 10px;font-size:.8rem" data-i18n="googleBtn">Harita görünmüyor mu? Google Haritalar'a geç</button><button type="button" id="karoBtn" style="padding:3px 10px;font-size:.8rem" data-i18n="karoBtn">Başka harita kaynağı dene</button></small></div>
+  <ul id="liste"></ul>
+</div>
+
+<footer>
+  <span>Bu bir ders projesi prototipidir. Mağaza konumları OpenStreetMap'ten canlı çekilir (kapsam eksik olabilir).</span>
+  <br><span data-i18n="gizlilik">Gizlilik: Konumunuz yalnızca yakındaki mağazaları bulmak için harita servislerine (OpenStreetMap, TomTom) sorgu olarak gönderilir; bu site konumunuzu kaydetmez veya saklamaz.</span>
+  <br><span data-i18n="iletisim">Öneri ve şikayetleriniz için:</span> <a href="mailto:cozmetai.iletisim@gmail.com">cosmetai.iletisim@gmail.com</a>
+  <br>© 2026 CosmetAI · <a href="https://github.com/zynpsn/CosmetAI" target="_blank" rel="noopener">GitHub</a>
+  <br><b>Sürüm / Version: H11 (TomTom + OSM birlikte)</b>
+</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>window.L || document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');</script>
+<script>window.L || document.write('<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"><\/script>');</script>
+<script>
+
+/* ========== 0) DİL VE TEMA ==========
+   Yeni dil eklemek için SOZLUK'e bir sütun (ör. de, ar) ekle ve #dilSec'e seçenek koy. */
+const SOZLUK = {
+  baslik:{tr:"CosmetAI", en:"CosmetAI"},
+  gizlilik:{tr:"Gizlilik: Konumunuz yalnızca yakındaki mağazaları bulmak için harita servislerine (OpenStreetMap, TomTom) sorgu olarak gönderilir; bu site konumunuzu kaydetmez veya saklamaz.", en:"Privacy: Your location is only sent as a query to map services (OpenStreetMap, TomTom) to find nearby stores; this site does not record or store it."},
+  iletisim:{tr:"Öneri ve şikayetleriniz için:", en:"Suggestions and complaints:"},
+  adim1:{tr:"Ürünü yaz (marka, ürün ve ton)", en:"Type the product (brand, product and shade)"},
+  adim2:{tr:"Konumunu paylaş ya da ilini seç", en:"Share your location or pick a province"},
+  adim3:{tr:"Yakındaki mağazaları haritada gör", en:"See nearby stores on the map"},
+  altBaslik:{tr:"Türkiye'nin 81 ilinde, aradığın kozmetik ürünün Gratis, Watsons, Rossmann, Sephora, Eve ve markaların kendi mağazalarında kaç adet olduğunu konumuna göre gör.",
+             en:"Across all 81 provinces of Türkiye, see how many units of the cosmetic product you want are at Gratis, Watsons, Rossmann, Sephora, Eve and brand stores near you."},
+  sayfaBaslik:{tr:"CosmetAI", en:"CosmetAI"},
+  temaEt:{tr:"Tema", en:"Theme"}, temaAuto:{tr:"Otomatik", en:"Automatic"}, temaLight:{tr:"Açık", en:"Light"}, temaDark:{tr:"Koyu", en:"Dark"},
+  dilEt:{tr:"Dil", en:"Language"},
+  araPh:{tr:"Örn: Sheglam rimel, Sephora Collection ruj", en:"e.g. Maybelline mascara, NARS concealer"},
+  araAria:{tr:"Ürün adı", en:"Product name"},
+  araBtn:{tr:"Ara", en:"Search"}, konumBtn:{tr:"Konumumu kullan", en:"Use my location"},
+  sadece:{tr:"Sadece stokta olanlar", en:"In stock only"},
+  ilEt:{tr:"Konum izni yoksa il seç:", en:"No location access? Pick a province:"}, ilSec:{tr:"İl seç", en:"Province"},
+  ekleSum:{tr:"Aradığın ürün yok mu? Kendin ekle (tek tek veya toplu)", en:"Can't find your product? Add it yourself (one by one or in bulk)"},
+  markaPh:{tr:"Marka (örn. Sheglam)", en:"Brand (e.g. Sheglam)"},
+  adPh:{tr:"Ürün adı ve ton (örn. Starlight Velvet Ruj 407 Flame)", en:"Product name and shade (e.g. Starlight Velvet Lipstick 407 Flame)"},
+  barkodPh:{tr:"Barkod (isteğe bağlı, 8-14 rakam)", en:"Barcode (optional, 8-14 digits)"},
+  renkEt:{tr:"Renk", en:"Colour"}, renkEkle:{tr:"renk ekle", en:"add colour"}, resimEt:{tr:"Resim", en:"Image"},
+  resimPh:{tr:"veya resim bağlantısı (https://... veya gorseller/dosya.jpg)", en:"or image link (https://... or gorseller/file.jpg)"},
+  ekleBtn:{tr:"Ekle", en:"Add"}, topluBtn:{tr:"İçe aktar", en:"Import"}, dosyaSec:{tr:"veya dosya seç (.csv / .txt)", en:"or choose a file (.csv / .txt)"},
+  topluAciklama:{tr:"<b>Toplu ekle:</b> Her satıra bir ürün yaz: <code>Marka | Ürün adı | Barkod | Renk | Resim</code> (barkod, renk, resim boş olabilir). Excel'den kopyaladığın tabloyu da yapıştırabilirsin.",
+                 en:"<b>Bulk add:</b> One product per line: <code>Brand | Product name | Barcode | Colour | Image</code> (barcode, colour and image may be empty). You can also paste a table copied from Excel."},
+  ekleNot:{tr:"Eklediklerin sadece bu cihazda, tarayıcında saklanır. Herkes için kalıcı olması için aşağıdaki satırları koddaki <code>EK_URUNLER</code> bölümüne yapıştır.",
+           en:"Products you add are stored only in this browser on this device. To make them permanent for everyone, paste the lines below into the <code>EK_URUNLER</code> section of the code."},
+  googleBtn:{tr:"Harita görünmüyor mu? Google Haritalar'a geç", en:"Map not showing? Switch to Google Maps"},
+  karoBtn:{tr:"Başka harita kaynağı dene", en:"Try another map source"},
+  footer:{tr:"Bu bir ders projesi prototipidir. Mağaza konumları OpenStreetMap'ten canlı çekilir (kapsam eksik olabilir). Stok adetleri ise örnek (simüle) veridir; gerçek stok bilgisi değildir. Ürün görselleri, kendi eklediklerin dışında, Open Beauty Facts açık veritabanından (CC BY-SA lisansı) gelir; resmi olmayan ürünlerde harf/renk kutusu gösterilir. Listede olmayan ürünler de serbest metinle aranabilir; ürün önerileri ayrıca Open Beauty Facts açık veritabanından gelir. Gerçek kullanımda stok verisi zincirlerle resmi iş birliği veya kullanıcı bildirimleri ile sağlanır.",
+          en:"This is a university course prototype. Store locations are fetched live from OpenStreetMap (coverage may be incomplete). Stock counts are sample (simulated) data, not real stock information. Product images, apart from the ones you add, come from the open Open Beauty Facts database (CC BY-SA licence); products without an image show a letter/colour tile. Products not in the list can still be searched as free text; extra suggestions also come from Open Beauty Facts. In real use, stock data would come from official partnerships with the chains or from user reports."},
+  // harita durumu
+  hDurumOn:{tr:"Harita durumu: ", en:"Map status: "},
+  hBaslat:{tr:"başlatılıyor…", en:"starting…"},
+  hGoogleHazir:{tr:"Google Haritalar gösteriliyor, ayrıntılı harita hazırlanıyor…", en:"Showing Google Maps while the detailed map loads…"},
+  hGoogle:{tr:"Google Haritalar kullanılıyor ({n}).", en:"Using Google Maps ({n})."},
+  hCalisiyor:{tr:"{ad} haritası çalışıyor.", en:"{ad} map is working."},
+  hDeneniyor:{tr:"{ad} deneniyor…", en:"Trying {ad}…"},
+  hZaten:{tr:"Google Haritalar zaten kullanılıyor.", en:"Google Maps is already in use."},
+  hYuklenemedi:{tr:"Ayrıntılı harita yüklenemedi, Google Haritalar kullanılıyor.", en:"The detailed map could not load; using Google Maps."},
+  nLib:{tr:"harita kütüphanesi yüklenemedi", en:"map library failed to load"},
+  nEngel:{tr:"harita görüntüleri engellendi", en:"map tiles were blocked"},
+  nGelmedi:{tr:"harita görüntüleri gelmedi", en:"map tiles did not arrive"},
+  nElle:{tr:"elle seçildi", en:"chosen manually"},
+  nHata:{tr:"hata: {m}", en:"error: {m}"},
+  // durum mesajları
+  osmYok:{tr:"OpenStreetMap'e şu an ulaşılamadı. Biraz sonra tekrar dene.", en:"OpenStreetMap could not be reached right now. Please try again shortly."},
+  magazaYok:{tr:"Bu bölgede OpenStreetMap'te kayıtlı mağaza bulunamadı.", en:"No stores are recorded in OpenStreetMap for this area."},
+  yedekAraniyor:{tr:"Yedek kaynakta (Nominatim) mağazalar aranıyor, birkaç saniye sürebilir...", en:"Searching the backup source (Nominatim), this may take a few seconds..."},
+  resmiSiteler:{tr:"Resmi sitelerden mağaza bul: ", en:"Find stores on the official sites: "},
+  magazaAraniyor:{tr:"Yakındaki mağazalar OpenStreetMap'te aranıyor...", en:"Searching OpenStreetMap for nearby stores..."},
+  konumIstek:{tr:"Konum izni isteniyor...", en:"Asking for location permission..."},
+  konumYok:{tr:"Konum alınamadı. Tarayıcıda konum iznini aç veya yukarıdan ilini seç.", en:"Could not get your location. Allow location access in your browser or pick a province above."},
+  renkRozet:{tr:"Renk ", en:"Colour "}, barkodRozet:{tr:"Barkod: ", en:"Barcode: "},
+  barkodAraniyor:{tr:"Barkod aranıyor...", en:"Looking up barcode..."},
+  barkodYok:{tr:"Bu barkod ürün veritabanında bulunamadı. Ürün adıyla aramayı dene veya aşağıdan kendin ekle.", en:"This barcode is not in the product database. Try searching by name or add it yourself below."},
+  bosArama:{tr:"Lütfen bir ürün adı yaz.", en:"Please type a product name."},
+  urunBulundu:{tr:"{n} ürün bulundu, birini seç:", en:"{n} products found, pick one:"},
+  urunYok:{tr:"Listemizde bu ürün yok. Yazdığın adla yine de aratabilir veya ürün veritabanından seçebilirsin:", en:"This product is not in our list. You can still search with the name you typed or pick one from the product database:"},
+  olarakAra:{tr:"“{q}” olarak ara", en:"Search for “{q}”"},
+  kaynakNot:{tr:"Mağaza konumları: OpenStreetMap (gerçek kayıtlar, eksik olabilir). Stok adetleri: örnek veri.", en:"Store locations: OpenStreetMap (real records, may be incomplete). Stock counts: sample data."},
+  kaynakNotG:{tr:"Mağaza konumları: Google Maps. Stok adetleri: örnek veri.", en:"Store locations: Google Maps. Stock counts: sample data."},
+  kaynakNotT:{tr:"Mağaza konumları: TomTom. Stok adetleri: örnek veri.", en:"Store locations: TomTom. Stock counts: sample data."},
+  kaynakNotX:{tr:"Mağaza konumları: {k} (gerçek kayıtlar, eksik olabilir). Stok adetleri: örnek veri.", en:"Store locations: {k} (real records, may be incomplete). Stock counts: sample data."},
+  zincirYok:{tr:"{u}: bu marka Gratis, Watsons, Rossmann, Sephora, Eve veya kendi mağazalarında satılmıyor (eczane ya da doğrudan satış markası olabilir).", en:"{u}: this brand is not sold at Gratis, Watsons, Rossmann, Sephora, Eve or its own stores (it may be a pharmacy or direct-sales brand)."},
+  listeYok:{tr:"{u} için yakında listelenecek mağaza bulunamadı.", en:"No nearby stores to list for {u}."},
+  sonucYok:{tr:"Sonuç yok. 'Sadece stokta olanlar' filtresini kapatmayı dene.", en:"No results. Try turning off the 'In stock only' filter."},
+  ozet:{tr:"{u}: sana en yakın {n} mağazadan {s} tanesinde stokta var.", en:"{u}: in stock at {s} of the {n} stores nearest to you."},
+  senBurada:{tr:"Sen buradasın", en:"You are here"},
+  stoktaYok:{tr:"Stokta yok", en:"Out of stock"}, azKaldi:{tr:"Az kaldı", en:"Low stock"}, stoktaVar:{tr:"Stokta var", en:"In stock"},
+  yolTarifi:{tr:"Yol tarifi", en:"Directions"}, adet:{tr:"adet", en:"units"},
+  resimNot:{tr:"\n(Yüklediğin resimler sadece bu cihazda kalır. Kalıcı olması için resmi GitHub'daki gorseller klasörüne yükleyip son sütuna gorseller/dosya.jpg yaz.)",
+            en:"\n(Images you uploaded stay on this device only. To make them permanent, upload the image to the gorseller folder on GitHub and write gorseller/file.jpg in the last column.)"},
+  depoDolu:{tr:"Tarayıcı depolaması dolu veya kapalı; ürünler sadece bu oturumda geçerli.\n", en:"Browser storage is full or disabled; products are only kept for this session.\n"},
+  kaliciYap:{tr:"Kalıcı yapmak için EK_URUNLER bölümüne şu satırları ekle:\n", en:"To make them permanent, add these lines to the EK_URUNLER section:\n"},
+  gecersizSatir:{tr:"Eklenecek geçerli satır bulunamadı. Format: Marka | Ürün adı | Barkod | Renk | Resim", en:"No valid lines to add. Format: Brand | Product name | Barcode | Colour | Image"},
+  eklendi:{tr:"{n} ürün eklendi. Artık aratabilirsin.", en:"{n} products added. You can search for them now."},
+  konumAlindi:{tr:"Konum alındı. Şimdi bir ürün ara.", en:"Location found. Now search for a product."},
+  ilSecildi:{tr:"{il} seçildi. Şimdi bir ürün ara.", en:"{il} selected. Now search for a product."},
+  haritaAria:{tr:"Mağaza haritası", en:"Store map"},
+  sayfaHatasi:{tr:"Sayfa hatası", en:"Page error"}
+};
+let DIL = "tr";
+try { DIL = localStorage.getItem("dil") || ((navigator.language || "tr").toLowerCase().startsWith("tr") ? "tr" : "en"); } catch (e) {}
+if (!["tr","en"].includes(DIL)) DIL = "en";
+function T(k, v){
+  const g = SOZLUK[k]; let t = g ? (g[DIL] || g.tr) : k;
+  if (v) for (const a in v) t = t.split("{" + a + "}").join(v[a]);
+  return t;
+}
+/* İngilizce modda ürün adlarındaki Türkçe kategori kelimelerini çevir (veri değişmez, sadece görünüm) */
+const KATEGORI_EN = [
+  ["Dudak Parlatıcısı","Lip Gloss"],["Dudak Parlatıcı","Lip Gloss"],["Dudak Kalemi","Lip Liner"],["Dudak Yağı","Lip Oil"],
+  ["Likit Mat Ruj","Liquid Matte Lipstick"],["Likit Ruj","Liquid Lipstick"],["Mat Ruj","Matte Lipstick"],["Parlak Ruj","Glossy Lipstick"],["Ruj Seti","Lipstick Set"],["Ruj","Lipstick"],
+  ["Likit Kapatıcı","Liquid Concealer"],["Kapatıcı","Concealer"],["Stick Fondöten","Stick Foundation"],["Fondöten","Foundation"],
+  ["Sabitleyici Pudra","Setting Powder"],["Pudra Allık","Powder Blush"],["Pudra","Powder"],["Likit Allık","Liquid Blush"],["Krem Allık","Cream Blush"],["Stick Allık","Stick Blush"],["Allık","Blush"],
+  ["Far Paleti","Eyeshadow Palette"],["Maskara","Mascara"],["Rimel","Mascara"],["Kaş Kalemi","Brow Pencil"],["Kaş Maskarası","Brow Mascara"],["Aydınlatıcı","Highlighter"],
+  ["Sınırlı Seri","Limited Edition"],["Köpük Yapılı","Mousse"],["Koleksiyonu","Collection"],["Oje","Nail Polish"],["Şampuan","Shampoo"],["Saç Kremi","Conditioner"],["Nemlendirici","Moisturiser"],["Güneş Kremi","Sunscreen"],["Parfüm","Perfume"],["Deodorant","Deodorant"],["Göz Farı Paleti","Eyeshadow Palette"],["Kaş","Brow"],["Mikro","Micro"],["9'lu","9-pan"]
+];
+function gorunenAd(t){
+  if (DIL !== "en" || !t) return t;
+  let r = t;
+  KATEGORI_EN.forEach(([tr, en]) => { r = r.replace(new RegExp("(^|\\s)" + tr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?=\\s|$)", "g"), "$1" + en); });
+  /* "Concealer Concealer", "Lip Gloss Lip Gloss" gibi tekrarları tek yap */
+  r = r.replace(/\b([A-Za-z]+(?: [A-Za-z]+)?) \1\b/g, "$1");
+  return r;
+}
+/* İngilizce arama: her kelime ya kendisiyle ya da Türkçe karşılığıyla eşleşir ("lipstick" -> "ruj" de bulunur) */
+const ESANLAM = {lipstick:["ruj"], lip:["dudak","ruj"], gloss:["parlatıcı"], liquid:["likit"], matte:["mat"], concealer:["kapatıcı"],
+  foundation:["fondöten"], mascara:["maskara","rimel"], blush:["allık"], powder:["pudra"], palette:["paleti"], eyeshadow:["far"],
+  highlighter:["aydınlatıcı"], brow:["kaş"], pencil:["kalemi"], liner:["kalemi"], nail:["oje"], polish:["oje"], shampoo:["şampuan"],
+  perfume:["parfüm"], conditioner:["saç kremi"], sunscreen:["güneş"], oil:["yağı"], setting:["sabitleyici"],
+  ruj:["lipstick","rouge","lip stylo","lip ink"], rimel:["maskara","mascara","lash"], maskara:["rimel","mascara","lash"],
+  fondöten:["foundation","fondoten","skin tint"], kapatıcı:["concealer","kapatici"], allık:["blush","allik"], pudra:["powder"],
+  parlatıcı:["gloss","parlatici"], aydınlatıcı:["highlighter","glow"], oje:["nail","lacquer"], kaş:["brow"], dudak:["lip"],
+  far:["eyeshadow","shadow","palet"], kalem:["pencil","liner","kalemi"], eyeliner:["liner"], şampuan:["shampoo"], krem:["cream","creme"]};
+const icerir = (ad, w) => ad.includes(w) || (ESANLAM[w] || []).some(x => ad.includes(x));
+function dilUygula(){
+  document.documentElement.lang = DIL;
+  document.title = T("sayfaBaslik");
+  document.querySelectorAll("[data-i18n]").forEach(e => { e.textContent = T(e.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-html]").forEach(e => { e.innerHTML = T(e.dataset.i18nHtml); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(e => { e.placeholder = T(e.dataset.i18nPh); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(e => { e.setAttribute("aria-label", T(e.dataset.i18nAria)); });
+  const ds = document.getElementById("dilSec"); if (ds) ds.value = DIL;
+}
+let TEMA = "auto";
+try { TEMA = localStorage.getItem("tema") || "auto"; } catch (e) {}
+function temaUygula(){
+  const koyu = TEMA === "dark" || (TEMA === "auto" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.documentElement.setAttribute("data-theme", koyu ? "dark" : "light");
+  const ts = document.getElementById("temaSec"); if (ts) ts.value = TEMA;
+}
+if (window.matchMedia) { try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => TEMA === "auto" && temaUygula()); } catch (e) {} }
+dilUygula(); temaUygula();
+/* ========== 1) VERİ ========== */
+/* 81 il merkezi: ad, enlem, boylam */
+const IL = ("Adana,37.00,35.32;Adıyaman,37.76,38.28;Afyonkarahisar,38.76,30.54;Ağrı,39.72,43.05;Aksaray,38.37,34.03;Amasya,40.65,35.83;Ankara,39.93,32.86;Antalya,36.89,30.71;Ardahan,41.11,42.70;Artvin,41.18,41.82;Aydın,37.85,27.84;Balıkesir,39.65,27.89;Bartın,41.64,32.34;Batman,37.89,41.13;Bayburt,40.26,40.23;Bilecik,40.14,29.98;Bingöl,38.88,40.50;Bitlis,38.40,42.11;Bolu,40.73,31.61;Burdur,37.72,30.29;Bursa,40.19,29.06;Çanakkale,40.15,26.41;Çankırı,40.60,33.62;Çorum,40.55,34.95;Denizli,37.78,29.09;Diyarbakır,37.91,40.24;Düzce,40.84,31.16;Edirne,41.68,26.56;Elazığ,38.67,39.22;Erzincan,39.75,39.49;Erzurum,39.90,41.27;Eskişehir,39.78,30.52;Gaziantep,37.07,37.38;Giresun,40.91,38.39;Gümüşhane,40.46,39.48;Hakkari,37.58,43.74;Hatay,36.40,36.35;Iğdır,39.92,44.04;Isparta,37.76,30.55;İstanbul,41.01,28.98;İzmir,38.42,27.14;Kahramanmaraş,37.58,36.94;Karabük,41.20,32.62;Karaman,37.18,33.22;Kars,40.60,43.10;Kastamonu,41.38,33.78;Kayseri,38.72,35.49;Kırıkkale,39.85,33.52;Kırklareli,41.74,27.23;Kırşehir,39.15,34.16;Kilis,36.72,37.12;Kocaeli,40.77,29.92;Konya,37.87,32.49;Kütahya,39.42,29.98;Malatya,38.35,38.31;Manisa,38.61,27.43;Mardin,37.31,40.74;Mersin,36.80,34.64;Muğla,37.22,28.36;Muş,38.74,41.49;Nevşehir,38.62,34.71;Niğde,37.97,34.68;Ordu,40.98,37.88;Osmaniye,37.07,36.25;Rize,41.02,40.52;Sakarya,40.76,30.40;Samsun,41.29,36.33;Siirt,37.93,41.94;Sinop,42.03,35.15;Sivas,39.75,37.02;Şanlıurfa,37.16,38.79;Şırnak,37.52,42.46;Tekirdağ,40.98,27.51;Tokat,40.31,36.55;Trabzon,41.00,39.72;Tunceli,39.11,39.55;Uşak,38.68,29.41;Van,38.49,43.38;Yalova,40.65,29.27;Yozgat,39.82,34.81;Zonguldak,41.45,31.79")
+  .split(";").map(s => { const p = s.split(","); return {ad:p[0], lat:+p[1], lng:+p[2]}; });
+
+/* Ürün kataloğu: marka -> ürünler (örnek katalog, istediğin kadar genişletebilirsin) */
+const KATALOG = [
+ ["L'Oréal Paris",["Telescopic Rimel","Color Riche Ruj","Paradise Rimel"]],
+ ["Flormar",["Perfect Coverage Kapatıcı"]],
+ ["Catrice",["Allround Kapatıcı"]]
+];
+const MAKYAJ = [];   // otomatik "Marka + ürün türü" ürünleri kaldırıldı: sadece gerçek ürün adları kullanılır
+const CILT = [];   // otomatik "Marka + ürün türü" ürünleri kaldırıldı: sadece gerçek ürün adları kullanılır
+const SAC = [];   // otomatik "Marka + ürün türü" ürünleri kaldırıldı: sadece gerçek ürün adları kullanılır
+const VUCUT = [];   // otomatik "Marka + ürün türü" ürünleri kaldırıldı: sadece gerçek ürün adları kullanılır
+const TUR = {};   // marka -> "kozmetik" | "parfum"
+const ekle = (marka, liste) => { const k = KATALOG.find(x => x[0] === marka); if (k) k[1].push(...liste); else KATALOG.push([marka, [...liste]]); };
+["Maybelline","L'Oréal Paris","NYX","Sheglam","Sephora Collection","Gratis","Watsons","Isana","Flormar","Golden Rose","Essence","Catrice","Kiko Milano","Pastel","Farmasi","Bourjois","Max Factor","Revlon","Rimmel","Moira","Revolution","Hean","Huda Beauty","Charlotte Tilbury","Rare Beauty","Fenty Beauty"].forEach(m => { ekle(m, MAKYAJ); TUR[m] = "kozmetik"; });
+["Nivea","Gratis","Watsons","Isana","Alterra","Garnier","Neutrogena","Cerave","La Roche-Posay","Bioderma","Eucerin","Avène","The Ordinary","Cetaphil","Bee Beauty","L'Oréal Paris","Sephora Collection"].forEach(m => { ekle(m, CILT); TUR[m] = "kozmetik"; });
+["Elidor","Pantene","Head & Shoulders","Dove","Schwarzkopf","Wella","Kérastase","Garnier","L'Oréal Paris","Gratis","Watsons","Isana"].forEach(m => { ekle(m, SAC); TUR[m] = "kozmetik"; });
+["Dove","Vaseline","Nivea","Rexona","Gratis","Watsons"].forEach(m => ekle(m, VUCUT));
+/* ---- Marka listesi (senin verdiğin liste) ---- */
+const MARKALAR = `Activex, Adidas, Agarta, Agiss, Agiva, Air Wick, Andrea, Anyong, Aprilla, Aqua di Polo, Ardell, Ariel, Arifoğlu, Arko Men, Arko Nem, Arko Sun Care, Arm&Hammer, Aryene, Arzum, Ashley Joy, Asperox, Astra, Atkinsons, Authoriderm, Avon, Axe, Ayouth Veda, AZTK, Baby Dove, Babyjem, Babyton, Bade Natural, Baga, Balmy, Banat, Batiste, Beaulis, Beauty Bomb, Beauty of Joseon, Bebak, Bee Beauty, Bee Home, Belizia, Bellissima, Benri, Benri Dent, Beter, Bic, Bio-Oil, Biobaby, Bioblas, Bionnex, Bioxcin, Blade, Blistex, Body Fantasies, Bolbe, Bonacure, Botanica, Bourjois, Braun, Bref, Brooks Brothers, Brut, Burberry, Burt's Bees, Cacharel, Caldion, Calliel, Calvin Klein, Carioca, Carnaval Socks, Carolina Herrera, Cashmere, Celenes, Centesol, Cheeky Chic, Cheeryep, Chi, Chloe, Christian Dior, Chupa Chups, Cif, Cinnamoroll, Cire Aseptine, Claderm, Clara Hygienics, Clear, Clinomyn, Clooe, Cocunat, Colgate, Colorgram, Cosmogenesis Labs, Cosnori, Costume National, Cream Co, Creme Supreme, Dabur, Daily Dream Care, Dalan, Dalan D'Olive, Dalin, Davidoff, Dax, Decubal, Defans, Dejavous, DentaSave, Deotak, Derby, Dermal, Dermapeel, Dermokil, Dermoten, Detan, Diesel, Dina Cosmetics, Dior, Diversey, DK Dent, DKNY, Dolce, Dolce & Gabbana, Domestos, Donawa, Dorco, Dove, Dp, Dr. EA, Dr. Pawpaw, Dr. PediPure, Dr.Beckmann, Duracell, Durex, Duru, Ecowell, Egos, Eklips, Eklips Home, El Gato, Elidor, Elie Saab, Ellips, Elly, Elroel, Elseve, Emily, Emo'i, Emotion, Ethereal, Eti, Etude, Evoluderm, Excellence, Eyewake, Eyüp Sabri Tuncer, Fa, Fairy, Fancier, Feat, Febreze, Fellas, Femfresh, First, First Class, Fixodent, Flormar, Foot Doctor, Foreo, Fraternikus, Freşa, fwee, Garnier, Getwell, Gillette, Gillette Venus, Giorgio Armani, Givenchy, Glade, Gliss, Glossy Blossom, Glow Lift, Golden Rose, Gosh, got2b, Görkito, Gösol, Green Therapy, Guinot, Gummylab, Hacı Şakir, Haribo, Hask, Hawaiian Tropic, Head&Shoulders, Headu, Heitmann, Hello Kity, Herbaderm, Herbal Essences, Hermes, Himalaya, Hobby, Hoito, Hugo Boss, Humble Brush, Hyp Me, Illusione, Imprime, Incia, Influence Beauty, Inkorea, Ioni, Isntree, Issey Miyake, Jacques Saint Pres, Jagler, Janssen Cosmetics, Jaune Vaste, Jean Paul Gaultier, Jeanne Arthes, Jeuvenile, Jil Sander, Jimmy Choo, JKosmec, John Frieda, Johnson's, Johnson's Baby, Joop, Jowe, Judydoll, Juliette Bellezza, Jurassic World, Juvenis, K2R, Kalyon, Kappa, Karline, Kativa, Kesechi, Kiwi, Korelya, Kotex, Krauterhof, Kremi, Kuaf, Kuromi, Lacoste, Laction Paris, Lancome, Lansinoh, Lapitak, Le Petit Marseillais, Let'scrub, Life In, Linziclip, Lionesse, Lip Smacker, Listerine, Loreal Paris, Loshel, Love Generation, Luis Bien, Luna Cucina, Lush Lash, LYKD, M&M's, M.Asam, Mamaaura, Mamonde, Manifest, Mara, Marc, Maru.Derm, Maybelline New York, Neutrogena, Nivea, NUSE, Old Spice, Orkid, Ourwhy, P&G, Pakette, Pantene, Pastel, Peros, Porçöz, Rexona, rom&nd, Schwarzkopf, Selpak, Sheglam, Signal, Sofia, Solest London, Solo, Stellary, Tereson, VT Cosmetics, wet n wild, Wildfare, Yumoş, Isana, Rival de Loop, Rival Loves Me, Alterra, Prokudent, For Your Beauty, Wellness & Beauty, Sunozon, Babydream, Facelle, Altapharma, Domol, Flink & Sauber, Genuss Plus, Rubin, enerBiO, Naturals by Watsons, Pure Beauty, Collagen by Watsons, Target Pro by Watsons, Dermaction Plus, Miine, Solait, Pink by Pure Beauty, Superdrug, Kruidvat, Revolution, Makeup Revolution, I Heart Revolution, Revolution Pro, e.l.f. Cosmetics, Nyx Professional Makeup, Scinic, Frudia, Deborah Milano, B. by Superdrug, Alama Professional, Sephora Collection, Rare Beauty, Fenty Beauty, Fenty Skin, Tarte, Huda Beauty, Charlotte Tilbury, Benefit Cosmetics, Milk Makeup, Anastasia Beverly Hills, Too Faced, Drunk Elephant, Sol de Janeiro, NARS, Natasha Denona, The Ordinary, Laneige, Glow Recipe, Byoma, Makeup by Mario, KVD Beauty, Ole Henriksen, Supergoop!, Mario Badescu, Fable & Mane, Ouai, Gisou, Eve, Technic, Wibo, Selfie Project, Beauty UK, MUA, Focallure, Pupa Milano, MAC Cosmetics, Kiko Milano, Bobbi Brown, Kryolan, Inglot, Missha, Smashbox, Note Cosmetique, Yves Rocher, The Body Shop, Bath & Body Works, Kiehl's, L'Occitane, Victoria's Secret, Atelier Rebul, Jo Malone London, Clinique, Estée Lauder, Lancôme, Dior Beauty, La Roche-Posay, CeraVe, Vichy, Bioderma, Eau Thermale Avène, Darphin, SkinCeuticals, Lierac, Institut Esthederm, Babe, Avon, Farmasi, Oriflame`.split(",").map(x => x.trim()).filter(Boolean);
+const ALIAS = {"Loreal Paris":"L'Oréal Paris","Maybelline New York":"Maybelline","Nyx Professional Makeup":"NYX","Head&Shoulders":"Head & Shoulders","Lancome":"Lancôme","Eau Thermale Avène":"Avène","Christian Dior":"Dior","Dior Beauty":"Dior","Hello Kity":"Hello Kitty","KIKO Milano":"Kiko Milano","Kiko":"Kiko Milano","Lykd":"LYKD","MAC":"MAC Cosmetics","M.A.C":"MAC Cosmetics"};
+const MARKA_ADI = m => ALIAS[m] || m;
+const liste = t => t.split(",").map(x => MARKA_ADI(x.trim())).filter(Boolean);
+const PARFUM = [];   // otomatik "Marka + ürün türü" ürünleri kaldırıldı: sadece gerçek ürün adları kullanılır
+MARKALAR.forEach(m => ekle(MARKA_ADI(m), []));
+liste("Bourjois,Flormar,Golden Rose,Gosh,Pastel,Beauty UK,Colorgram,Etude,Judydoll,rom&nd,Stellary,wet n wild,Technic,Wibo,Selfie Project,MUA,Focallure,Pupa Milano,MAC Cosmetics,Kiko Milano,Bobbi Brown,Kryolan,Inglot,Missha,Smashbox,Note Cosmetique,Deborah Milano,Revolution,Makeup Revolution,I Heart Revolution,Revolution Pro,e.l.f. Cosmetics,Nyx Professional Makeup,Alama Professional,Rare Beauty,Fenty Beauty,Tarte,Huda Beauty,Charlotte Tilbury,Benefit Cosmetics,Milk Makeup,Anastasia Beverly Hills,Too Faced,Natasha Denona,KVD Beauty,Makeup by Mario,NARS,fwee,Maybelline New York,Loreal Paris").forEach(m => { ekle(m, MAKYAJ); TUR[m] = "kozmetik"; });
+liste("Beauty of Joseon,Isntree,Frudia,Scinic,Laneige,Glow Recipe,Byoma,Drunk Elephant,The Ordinary,Ole Henriksen,Supergoop!,Mario Badescu,Kiehl's,Clinique,Estée Lauder,La Roche-Posay,CeraVe,Vichy,Bioderma,Eau Thermale Avène,Darphin,SkinCeuticals,Lierac,Institut Esthederm,Babe,Neutrogena,Bio-Oil,Guinot,Janssen Cosmetics,Burt's Bees,Etude,Missha,Dermokil,Dermoten,Bee Beauty,Nivea").forEach(m => { ekle(m, CILT); TUR[m] = "kozmetik"; });
+liste("Elidor,Elseve,Pantene,Head&Shoulders,Schwarzkopf,Gliss,Herbal Essences,got2b,Hask,John Frieda,Batiste,Chi,Fable & Mane,Ouai,Gisou,Bonacure,Clear,Bioxcin").forEach(m => { ekle(m, SAC); TUR[m] = "kozmetik"; });
+liste("Burberry,Cacharel,Calvin Klein,Carolina Herrera,Chloe,Davidoff,Diesel,Dior,DKNY,Dolce & Gabbana,Elie Saab,Giorgio Armani,Givenchy,Hermes,Hugo Boss,Issey Miyake,Jean Paul Gaultier,Jimmy Choo,Jil Sander,Joop,Lacoste,Lancome,Brooks Brothers,Costume National,Aqua di Polo,Jeanne Arthes,Jo Malone London,Atelier Rebul,Victoria's Secret,Bath & Body Works,Sol de Janeiro,Atkinsons").forEach(m => { ekle(m, PARFUM); if (!TUR[m]) TUR[m] = "parfum"; });
+["Maybelline","L'Oréal Paris","NYX","Sheglam","Essence","Catrice","Flormar","Golden Rose","Farmasi","Max Factor","Revlon","Rimmel","Moira","Hean","Garnier","Nivea","Avène","Eucerin","Cetaphil","Elidor","Pantene","Head & Shoulders","Dove","Wella","Kérastase","Vaseline","Rexona","Bee Beauty","Pastel","Kiko Milano","Neutrogena","CeraVe","Isana","Alterra"].forEach(m => { TUR[m] = TUR[m] || "kozmetik"; });
+/* Her markada ilk sırada "(tüm ürünler)" seçeneği olsun */
+KATALOG.forEach(k => { k[1] = ["(tüm ürünler)", ...k[1].filter(x => x !== "(tüm ürünler)")]; });
+let _id = 1;
+const URUNLER = KATALOG.flatMap(([marka, liste]) => [...new Set(liste)].map(ad => ({id:_id++, marka, ad})));
+
+/* KENDİ ÜRÜNLERİNİ BURAYA EKLE (her satır bir ürün).
+   Format:  Marka | Ürün adı (ton dahil) | Barkod | Renk kodu | Resim
+   Barkod, renk ve resim boş bırakılabilir. Renk: #c0392b gibi. Resim: gorseller/sheglam-407.jpg gibi
+   (GitHub deposuna "gorseller" klasörü aç, resmi yükle) veya https:// ile başlayan bağlantı.
+   Örnek:   Sheglam | Starlight Velvet Ruj 407 Flame | 8681234567890 | #c0392b | gorseller/sheglam-407.jpg */
+const EK_URUNLER = `
+Sheglam | Starlight Velvet Ruj 407 Flame | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 095 Fair Porcelain | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 097 Natural Porcelain | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 100 Warm Ivory | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 101 True Ivory | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 102 Fair Ivory | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 104 Soft Ivory | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 105 Natural Ivory | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 107 Rose Beige | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 110 Porcelain | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 112 Soft Beige | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 115 Ivory | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 118 Nude | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 120 Classic Ivory | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 122 Creamy Beige | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 124 Soft Sand | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 128 Warm Nude | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 130 Buff Beige | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 220 Natural Beige | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 230 Natural Buff | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 238 Rich Tan | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 245 Classic Beige | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 250 Sun Beige | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 312 Golden | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 320 Natural Tan | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 330 Toffee | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 332 Golden Caramel | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 334 Warm Tan | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 335 Classic Tan | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 350 Caramel | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 356 Warm Coconut | | |
+Maybelline | Fit Me! Matte + Poreless Fondöten 360 Mocha | | |
+Maybelline | Fit Me Kapatıcı 01 Cool Ivory | | |
+Maybelline | Fit Me Kapatıcı 05 Ivory | | |
+Maybelline | Fit Me Kapatıcı 10 Fair | | |
+Maybelline | Fit Me Kapatıcı 11 Vanilla | | |
+Maybelline | Fit Me Kapatıcı 15 Light | | |
+Maybelline | Fit Me Kapatıcı 20 Sand | | |
+Maybelline | Fit Me Kapatıcı 22 Wheat | | |
+Maybelline | Fit Me Kapatıcı 25 Medium | | |
+Maybelline | Fit Me Kapatıcı 30 Honey | | |
+Maybelline | Fit Me Kapatıcı 35 Deep | | |
+Maybelline | Fit Me Kapatıcı 40 Caramel | | |
+Maybelline | Fit Me Kapatıcı 45 Tan | | |
+Maybelline | Fit Me Kapatıcı 50 Cafe | | |
+Maybelline | Fit Me Kapatıcı 55 Hazelnut | | |
+Maybelline | Fit Me Kapatıcı 57 Walnut | | |
+Maybelline | Fit Me Kapatıcı 60 Cocoa | | |
+Maybelline | Fit Me Kapatıcı 65 Coffee | | |
+Maybelline | Fit Me Kapatıcı 70 Dark Coffee | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 95 Cool Ivory | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 100 Ivory | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 110 Fair | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 115 Warm Light | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 120 Light | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 121 Light Honey | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 122 Sand | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 130 Medium | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 140 Honey | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 144 Caramel | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 146 Tan | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 147.5 Mahogany | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 148 Hazelnut | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 149 Deep Bronze | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 150 Neutralizer | | |
+Maybelline | Instant Age Rewind Eraser Kapatıcı 160 Brightener | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 15 Peachy | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 35 Cheeky | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 45 Capricious | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 50 Wicked | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 62 Irresistible | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 65 Saucy | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 100 Charmed | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 115 Peppy | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 120 Punchy | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 125 Keen | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj 145 Rogue | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Coy | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Lippy | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Red-Hot | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Royal | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Unrivaled | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Upbeat | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Witty | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Captivated | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Extra | | |
+Maybelline | Super Stay Vinyl Ink Likit Ruj Golden | | |
+Maybelline | SuperStay Matte Ink Likit Ruj 10 Dreamer | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Believer | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Creator | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Escapist | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Exhilarator | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Heroine | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Hustler | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Individualist | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Innovator | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Lover | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Loyalist | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Mover | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Pathfinder | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Pioneer | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Revolutionary | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Ringleader | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Romantic | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Savant | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Shot Caller | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Voyager | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Soloist | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Ruler | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Initiator | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Driver | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Poet | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Seductress | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Amazonian | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Fighter | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Artist | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Birthday Babe | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Birthday Bestie | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Composer | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Dancer | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Explorer | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Founder | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Globetrotter | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Ground-Breaker | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Guest of Honor | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Inspirer | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Life of the Party | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Originator | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Party Goer | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Self-Starter | | |
+Maybelline | SuperStay Matte Ink Likit Ruj Show Runner | | |
+Maybelline | Lash Sensational Sky High Maskara Very Black | | |
+Maybelline | Lash Sensational Sky High Maskara True Brown | | |
+Maybelline | Lash Sensational Sky High Maskara Cosmic Black | | |
+Maybelline | Lash Sensational Sky High Maskara Burgundy Haze | | |
+Maybelline | Lash Sensational Sky High Maskara Pink Air | | |
+Maybelline | Firework Maskara Black | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 100 Fairytale Ending | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 115 Snooze Your Alarm | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 120 Major Crush | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 245 French Kiss | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 420 Le Rouge Paris | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 500 Wine Not | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 560 Pay Day | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 600 First Kiss | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 601 Worth It | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 625 Summer Fling | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 630 Rose Heat | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 635 Worth It Medium | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 645 Crush Alert | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 650 Wedding Night | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 655 Proposal | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 660 First Love | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj 665 First Move | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj Breakfast in Bed | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj Shopping Spree | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj Tropical Vacay | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj Road Tripping | | |
+L'Oréal Paris | Infaillible Matte Resistance Likit Ruj Lazy Sunday | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 10 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 15 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 20 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 100 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 110 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 120 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 125 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 130 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 132 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 140 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 145 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 200 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 220 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 235 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 260 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 300 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 310 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 315 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 320 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 330 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 365 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 392 | | |
+L'Oréal Paris | Infaillible 32H Fresh Wear Fondöten 410 | | |
+L'Oréal Paris | True Match Fondöten 6.5.W Golden Toffee | | |
+NYX | Soft Matte Lip Cream Likit Ruj Istanbul | | |
+NYX | Soft Matte Lip Cream Likit Ruj Stockholm | | |
+NYX | Soft Matte Lip Cream Likit Ruj Sao Paulo | | |
+NYX | Soft Matte Lip Cream Likit Ruj Monte Carlo | | |
+NYX | Soft Matte Lip Cream Likit Ruj Budapest | | |
+NYX | Soft Matte Lip Cream Likit Ruj Rome | | |
+NYX | Soft Matte Lip Cream Likit Ruj Berlin | | |
+NYX | Soft Matte Lip Cream Likit Ruj Madrid | | |
+NYX | Soft Matte Lip Cream Likit Ruj Dubai | | |
+NYX | Soft Matte Lip Cream Likit Ruj Zurich | | |
+NYX | Soft Matte Lip Cream Likit Ruj Athens | | |
+NYX | Soft Matte Lip Cream Likit Ruj London | | |
+NYX | Soft Matte Lip Cream Likit Ruj Abu Dhabi | | |
+NYX | Soft Matte Lip Cream Likit Ruj Milan | | |
+NYX | Soft Matte Lip Cream Likit Ruj Transylvania | | |
+NYX | Soft Matte Lip Cream Likit Ruj Cannes | | |
+NYX | Soft Matte Lip Cream Likit Ruj Prague | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 01 My Main | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 02 Missed Call | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 03 Supermodel | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 04 That's Chic | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 05 Newsfeed | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 06 Follow Back | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 07 Scrollin | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 08 Status Update | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 09 Chillin' Like a Villain | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 10 Splash of Cream | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 11 Livin' the Cream | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 12 Sprinkle Sprinkle | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 13 Losin' Cone-Trol | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 14 Inside Scoop | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 15 Citrus Chiller | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 16 Strawberry Slush | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 18 Polar Peppermint | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 19 Kiwi Freezie | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 20 Suga Baddie | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 21 Juicy Boo | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 22 Coconut Cutie | | |
+NYX | Fat Oil Lip Drip Dudak Parlatıcı 23 Caramelt Mami | | |
+Flormar | Silk Matte Likit Ruj 001 Undressed | | |
+Flormar | Silk Matte Likit Ruj 002 | | |
+Flormar | Silk Matte Likit Ruj 003 | | |
+Flormar | Silk Matte Likit Ruj 004 Daisy | | |
+Flormar | Silk Matte Likit Ruj 005 | | |
+Flormar | Silk Matte Likit Ruj 006 | | |
+Flormar | Silk Matte Likit Ruj 012 | | |
+Flormar | Silk Matte Likit Ruj 015 Pretty Plum | | |
+Flormar | Silk Matte Likit Ruj 018 Sunny Land | | |
+Flormar | Silk Matte Likit Ruj 02 Fall Rose | | |
+Flormar | Silk Matte Likit Ruj 052 | | |
+Flormar | Silk Matte Likit Ruj 058 Make It Memorable | | |
+Flormar | Silk Matte Likit Ruj 061 | | |
+Flormar | Silk Matte Likit Ruj Autumny Timbery | | |
+Flormar | Sheer Up Ruj 001 Harmony | | |
+Flormar | Sheer Up Ruj 002 So You | | |
+Flormar | Sheer Up Ruj 003 Pinky Nude | | |
+Flormar | Sheer Up Ruj 004 Warm Peach | | |
+Flormar | Sheer Up Ruj 005 Pretty Peach | | |
+Flormar | Sheer Up Ruj 006 Tangerine | | |
+Flormar | Sheer Up Ruj 009 Baby Girl | | |
+Flormar | Sheer Up Ruj 010 Thulian Pink | | |
+Flormar | Sheer Up Ruj 013 Gaia | | |
+Flormar | Sheer Up Ruj 015 Go For Bordeaux | | |
+Flormar | Sheer Up Ruj 018 Enchanted Kiss | | |
+Flormar | Sheer Up Ruj 019 Mystic Rose | | |
+Flormar | Sheer Up Ruj 022 Daring Whisper | | |
+Flormar | Sheer Up Ruj 023 Candy Crush | | |
+Flormar | Sheer Up Intense Ruj | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 9 So Red | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 17 Dust Rose | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 19 Ruby | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 20 Ember Pink | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 27 New Peach | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 29 Daydreamer | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 30 Smoked Ruby | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 31 Delilah | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 36 | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 37 Red Sangria | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 38 Salsa | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 39 Ruby Rose | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 40 Clay Caramel | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 42 Plum Kiss | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 43 Toasted Red | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 44 Red Island | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 45 Clay Red | | |
+Golden Rose | Velvet Matte Ruj 01 | | |
+Golden Rose | Velvet Matte Ruj 02 | | |
+Golden Rose | Velvet Matte Ruj 03 | | |
+Golden Rose | Velvet Matte Ruj 06 | | |
+Golden Rose | Velvet Matte Ruj 07 | | |
+Golden Rose | Velvet Matte Ruj 12 | | |
+Golden Rose | Velvet Matte Ruj 14 | | |
+Golden Rose | Velvet Matte Ruj 15 | | |
+Golden Rose | Velvet Matte Ruj 16 | | |
+Golden Rose | Velvet Matte Ruj 18 | | |
+Golden Rose | Velvet Matte Ruj 19 | | |
+Golden Rose | Velvet Matte Ruj 20 | | |
+Golden Rose | Velvet Matte Ruj 21 | | |
+Golden Rose | Velvet Matte Ruj 22 | | |
+Golden Rose | Velvet Matte Ruj 27 | | |
+Golden Rose | Velvet Matte Ruj 28 | | |
+Golden Rose | Velvet Matte Ruj 29 | | |
+Golden Rose | Velvet Matte Ruj 31 | | |
+Golden Rose | Velvet Matte Ruj 39 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 03 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 09 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 13 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 16 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 18 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 19 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 20 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 21 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 22 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 24 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 27 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 30 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 35 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 37 | | |
+Golden Rose | Longstay Liquid Matte Likit Ruj 43 | | |
+Golden Rose | Pure Matte Powder Ruj 103 | | |
+Golden Rose | Pure Matte Powder Ruj 122 | | |
+Golden Rose | Mood Satiny Matte Ruj 03 Nude Rose | | |
+Essence | Lash Princess Sculpted Volume Maskara | | |
+Essence | Lash Princess False Lash Effect Maskara | | |
+Essence | Lash Princess False Lash Effect Waterproof Maskara | | |
+Essence | Lash Princess False Lash Effect Extreme Waterproof Maskara | | |
+Essence | Lash Princess Curl & Volume Maskara | | |
+Essence | Lash Princess Volume Maskara | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 01 Clear | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 02 Natural Beige | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 03 Pearly Apricot | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 04 Pearly Peach Rose | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 05 Pearly Pink | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 06 Candy Rose | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 07 Pink Magnolia | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 08 Natural Rosewood | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 09 Soft Coral | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 10 Sparkling Strawberry | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 11 Golden Red | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 12 Pearly Amaryllis Red | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 13 Fire Red | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 15 Cherry Red | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 16 Iridescent Ruby | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 17 Pearly Mauve | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 18 Golden Sparkle | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 19 Cream Cashmere | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 20 Chestnut | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 21 Brun Rose | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 22 Sparkling Red Garnet | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 23 Magenta | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 26 Sparkling Hibiscus Pink | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 27 Pearly Lavender | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 30 Deep Purple | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 31 Pearly Shell | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 32 Pearly Natural Rose | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 33 Pearly Watermelon | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 34 Pearly Blood Orange | | |
+Kiko Milano | 3D Hydra Lipgloss Dudak Parlatıcı 35 Pearly Warm Mauve | | |
+Kiko Milano | 3D Hydra Lipgloss (Sınırlı Seri) Dudak Parlatıcı 41 Rosy Glares | | |
+Kiko Milano | 3D Hydra Lipgloss (Sınırlı Seri) Dudak Parlatıcı 42 Charming Copper | | |
+Kiko Milano | 3D Hydra Lipgloss (Sınırlı Seri) Dudak Parlatıcı 43 Timeless Rose | | |
+Kiko Milano | 3D Hydra Lipgloss (Sınırlı Seri) Dudak Parlatıcı 44 Disruptive Brown | | |
+Kiko Milano | 3D Hydra Lipgloss (Sınırlı Seri) Dudak Parlatıcı 45 Enchanting Rosewood | | |
+Kiko Milano | 3D Hydra Lipgloss (Sınırlı Seri) Dudak Parlatıcı 46 Marvellous Mauve | | |
+Kiko Milano | 3D Hydra Xtreme Lipgloss Dudak Parlatıcı 01 Pink Glacier | | |
+Kiko Milano | 3D Hydra Xtreme Lipgloss Dudak Parlatıcı 02 Irish Coffee | | |
+Kiko Milano | 3D Hydra Xtreme Lipgloss Dudak Parlatıcı 03 Cocoaquake | | |
+Kiko Milano | 3D Hydra Xtreme Lipgloss Dudak Parlatıcı 04 Lips Don't Lie | | |
+Kiko Milano | 3D Hydra Xtreme Lipgloss Dudak Parlatıcı 05 Catch Me Cupid | | |
+Kiko Milano | 3D Hydra Xtreme Lipgloss Dudak Parlatıcı 06 Color Affair | | |
+Revolution | Forever Flawless Bare Pink Far Paleti | | |
+Revolution | Forever Flawless Butterfly Far Paleti | | |
+Revolution | Forever Flawless Regal Romance Far Paleti | | |
+Revolution | Forever Flawless Show Stopper Far Paleti | | |
+Revolution | Forever Flawless Nude Silk Far Paleti | | |
+Revolution | Reloaded Iconic 2.0 Far Paleti | | |
+Revolution | Reloaded Dimension Neutral Charm Far Paleti | | |
+Revolution | Reloaded Wild Nights Far Paleti | | |
+Revolution | Reloaded Iconic Fever Far Paleti | | |
+Revolution | Maxi Reloaded Monster Mattes Far Paleti | | |
+Revolution | Mini Reloaded Far Paleti | | |
+Revolution | Nudes Ultimate (45 renk) Far Paleti | | |
+Revolution | Hot Shot Far Paleti | | |
+Revolution | Hot Shot Passion Fire Far Paleti | | |
+Revolution | The Celestial Icon Ethereal Far Paleti | | |
+Revolution | The True Icon Bronze Far Paleti | | |
+Revolution | Relove Colour Play Far Paleti | | |
+Revolution | Relove Colour Play Love Mindful Far Paleti | | |
+Revolution | Relove Colour Play Empower Far Paleti | | |
+Revolution | Relove Colour Play Believe Far Paleti | | |
+Revolution | Relove Colour Play Motivate Far Paleti | | |
+Revolution | Relove Colour Play Courage Far Paleti | | |
+Revolution | Relove Colour Play Cherish Far Paleti | | |
+Revolution | Relove Colour Play Soulful Far Paleti | | |
+Revolution | X Friends You Love Me Far Paleti | | |
+Revolution | X Soph Mini Far Paleti | | |
+Revolution | X Sebile Day 2 Day Far Paleti | | |
+Revolution | Bratz Doll Chloe Far Paleti | | |
+Revolution | Lion King Hakuna Matata Far Paleti | | |
+Revolution | Conceal & Define Kapatıcı C1 | | |
+Revolution | Conceal & Define Kapatıcı C2 | | |
+Beaulis | Close It Likit Kapatıcı 130 Porcelain | | |
+Beaulis | Close It Likit Kapatıcı 132 Pale Almond | | |
+Beaulis | Close It Likit Kapatıcı 134 Sand | | |
+Beaulis | Close It Likit Kapatıcı 135 Light Beige | | |
+Beaulis | Close It Likit Kapatıcı 650 Pink Sand | | |
+Beaulis | Zip It Likit Mat Ruj 117 Rosy | | |
+Beaulis | Zip It Likit Mat Ruj 276 Light Coral | | |
+Beaulis | Zip It Likit Mat Ruj 553 Delight | | |
+Beaulis | Keep It Ink Crayon Ruj 244 Shopping Time | | |
+Beaulis | Wonder Shroom Köpük Yapılı Mat Ruj 270 Tale | | |
+Beaulis | Kiss It Stick Ruj 111 Soft Kiss | | |
+Beaulis | Mini Likit Parlak Ruj Seti 213 Shimmerly | | |
+LYKD | My Cover Up Likit Kapatıcı 116 Soft Nude | | |
+LYKD | My Cover Up Likit Kapatıcı 128 Light Beige | | |
+LYKD | My Cover Up Likit Kapatıcı 131 Linen | | |
+LYKD | My Cover Up Likit Kapatıcı 135 Cream | | |
+LYKD | My Cover Up Likit Kapatıcı 500 Bright | | |
+LYKD | Fondöten 109 Rose Sand | | |
+LYKD | Stick Fondöten 116 Soft Nude | | |
+LYKD | Stick Fondöten 128 Light Beige | | |
+LYKD | Mat Ruj 125 Rose Blush | | |
+LYKD | Mat Ruj 169 Hot Rust | | |
+LYKD | Mat Ruj 354 Red Love | | |
+LYKD | Mat Ruj 370 Warm Berry | | |
+LYKD | Mat Ruj 539 Pink Plumeria | | |
+LYKD | Powder Mat Ruj 337 Cherry On Top | | |
+LYKD | Merry Ruj 291 Soft Coral | | |
+LYKD | Merry Ruj 516 Warm Pink | | |
+LYKD | Merry Ruj 584 Light Mulberry | | |
+LYKD | Parlak Ruj 519 Rosy Blossom | | |
+LYKD | Parlak Ruj 535 Fall Breeze | | |
+LYKD | Dudak Parlatıcısı 172 Cacao | | |
+LYKD | Dudak Kalemi 203 Autumn | | |
+LYKD | Baked Allık 236 Love Potion | | |
+LYKD | Glow-Getter Stick Allık 232 Juicy | | |
+LYKD | Allık 530 Sweet Pink | | |
+LYKD | Krem Allık 506 Pink Dream | | |
+LYKD | Aura Likit Allık 261 Amber Glow | | |
+LYKD | My Style Up Sabitleyici Pudra 135 Sand | | |
+LYKD | My Style Up Sabitleyici Pudra 140 Buff | | |
+LYKD | My Cheeks Up Bronzer 191 Light Bronzer | | |
+LYKD | Silky Touch Aydınlatıcı 980 Rayelle | | |
+LYKD | Mikro Kaş Kalemi 160 Chocolate Brown | | |
+LYKD | Mikro Kaş Kalemi 161 Dark Brown | | |
+LYKD | Kaş Maskarası 196 Chestnut | | |
+LYKD | 9'lu Far Paleti 155 New Nude | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Velvet Teddy | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Chili | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Diva | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Warm Teddy | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Flamingo | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Marrakesh | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Russian Red | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Taupe | | |
+MAC Cosmetics | MACximal Silky Matte Ruj No Coral-ation | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Overstatement | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Lady Danger | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Caviar | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Mull It To The Max | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Snob | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Go Retro | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Captive | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Media | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Red Rock | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Sugar Dada | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Cafe Mocha | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Honey Love | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Kinda Sexy | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Ruby Woo | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Avant Garnet | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Antique Velvet | | |
+MAC Cosmetics | MACximal Silky Matte Ruj D For Danger | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Whirl | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Mehr | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Candy Yum Yum | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Heroine | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Sin | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Smoked Purple | | |
+MAC Cosmetics | MACximal Silky Matte Ruj You Wouldn't Get It | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Soar | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Get The Hint? | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Ring The Alarm | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Sweet Deal | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Keep Dreaming | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Forever Curious | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Iconic Photo | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Acting Natural | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Cool Teddy | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Folio | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Bare Macximal | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Yash | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Dare Me | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Hot Girl Pink | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Unbothered | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Verve Swerve | | |
+MAC Cosmetics | MACximal Silky Matte Ruj Twig Twist | | |
+MAC Cosmetics | MACximal Silky Matte Ruj In Sepia Koleksiyonu Timeless Taupe | | |
+NARS | Radiant Creamy Concealer Kapatıcı L1 Chantilly | | |
+NARS | Radiant Creamy Concealer Kapatıcı L1.25 Affogato | | |
+NARS | Radiant Creamy Concealer Kapatıcı L2 Vanilla | | |
+NARS | Radiant Creamy Concealer Kapatıcı L2.2 Nougatine | | |
+NARS | Radiant Creamy Concealer Kapatıcı L2.3 Madeleine | | |
+NARS | Radiant Creamy Concealer Kapatıcı L2.4 Café au Lait | | |
+NARS | Radiant Creamy Concealer Kapatıcı L2.5 Crème Brulée | | |
+NARS | Radiant Creamy Concealer Kapatıcı L2.6 Café con Leche | | |
+NARS | Radiant Creamy Concealer Kapatıcı L2.75 Cannelle | | |
+NARS | Radiant Creamy Concealer Kapatıcı L2.8 Marron Glacé | | |
+NARS | Radiant Creamy Concealer Kapatıcı L3 Honey | | |
+NARS | Radiant Creamy Concealer Kapatıcı M0 Crema Catalana | | |
+NARS | Radiant Creamy Concealer Kapatıcı M1 Custard | | |
+NARS | Radiant Creamy Concealer Kapatıcı M1.25 Toffee | | |
+NARS | Radiant Creamy Concealer Kapatıcı M1.5 Macadamia | | |
+NARS | Radiant Creamy Concealer Kapatıcı M1.75 Tiramisu | | |
+NARS | Radiant Creamy Concealer Kapatıcı M2 Ginger | | |
+NARS | Radiant Creamy Concealer Kapatıcı M3 Praline | | |
+NARS | Radiant Creamy Concealer Kapatıcı MD1 Biscuit | | |
+NARS | Radiant Creamy Concealer Kapatıcı MD1.5 Sucre d'Orge | | |
+NARS | Radiant Creamy Concealer Kapatıcı MD2 Caramel | | |
+NARS | Radiant Creamy Concealer Kapatıcı MD2.5 Chestnut | | |
+NARS | Radiant Creamy Concealer Kapatıcı MD2.6 Walnut | | |
+NARS | Radiant Creamy Concealer Kapatıcı MD2.75 Truffle | | |
+NARS | Radiant Creamy Concealer Kapatıcı MD3 Amande | | |
+NARS | Radiant Creamy Concealer Kapatıcı MD4 Hazelnut | | |
+NARS | Radiant Creamy Concealer Kapatıcı D0 Chocolat | | |
+NARS | Radiant Creamy Concealer Kapatıcı D1 Café | | |
+NARS | Radiant Creamy Concealer Kapatıcı D2 Cacao | | |
+NARS | Radiant Creamy Concealer Kapatıcı D3 Dark Coffee | | |
+NARS | Blush Pudra Allık Orgasm | | |
+NARS | Blush Pudra Allık Orgasm Edge | | |
+NARS | Blush Pudra Allık Orgasm Rush | | |
+NARS | Blush Pudra Allık Orgasm X | | |
+NARS | Blush Pudra Allık Deep Throat | | |
+NARS | Blush Pudra Allık Behave | | |
+NARS | Blush Pudra Allık Sex Appeal | | |
+NARS | Blush Pudra Allık Dominant | | |
+NARS | Blush Pudra Allık Obsession | | |
+NARS | Blush Pudra Allık Amour | | |
+NARS | Blush Pudra Allık Torrid | | |
+NARS | Blush Pudra Allık Taj Mahal | | |
+NARS | Blush Pudra Allık Dolce Vita | | |
+NARS | Blush Pudra Allık Thrill | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Fenty Glow | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Fu$$y | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Hot Chocolit | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Glass Slipper | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı $weet Mouth | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Riri | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Fuchsia Flex | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Rose Amber | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Mango Margz | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Gimme Space | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Wattabrat | | |
+Fenty Beauty | Gloss Bomb Universal Lip Luminizer Dudak Parlatıcı Champ Stamp Fantasy (Sephora'ya özel) | | |
+Rare Beauty | Soft Pinch Liquid Blush Dewy Likit Allık Joy | | |
+Rare Beauty | Soft Pinch Liquid Blush Dewy Likit Allık Happy | | |
+Rare Beauty | Soft Pinch Liquid Blush Dewy Likit Allık Lucky | | |
+Rare Beauty | Soft Pinch Liquid Blush Dewy Likit Allık Grateful | | |
+Rare Beauty | Soft Pinch Liquid Blush Dewy Likit Allık Hope | | |
+Rare Beauty | Soft Pinch Liquid Blush Dewy Likit Allık Encourage | | |
+Rare Beauty | Soft Pinch Liquid Blush Dewy Likit Allık Believe | | |
+Rare Beauty | Soft Pinch Liquid Blush Dewy Likit Allık Worth | | |
+Rare Beauty | Soft Pinch Liquid Blush Dewy Likit Allık Virtue | | |
+Rare Beauty | Soft Pinch Liquid Blush Matte Likit Allık Bliss | | |
+Rare Beauty | Soft Pinch Liquid Blush Matte Likit Allık Love | | |
+Rare Beauty | Soft Pinch Liquid Blush Matte Likit Allık Grace | | |
+Rare Beauty | Soft Pinch Liquid Blush Matte Likit Allık Faith | | |
+Rare Beauty | Soft Pinch Liquid Blush Likit Allık Spirited | | |
+Rare Beauty | Soft Pinch Liquid Blush Likit Allık Adore | | |
+Rare Beauty | Soft Pinch Liquid Blush Likit Allık Resilience | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Sugar Cookie | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Cupcake | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Ube Birthday Cake | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Cherry Blossom Cake | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Pound Cake | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Peach Pie | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Banana Bread | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Blondie | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Kunafa | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Cinnamon Bun | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Coffee Cake | | |
+Huda Beauty | Easy Bake Loose Baking & Setting Powder Pudra Matcha Milk Cake | | |
+Huda Beauty | #FauxFilter Luminous Matte Fondöten 120B Vanilla | | |
+Huda Beauty | #FauxFilter Luminous Matte Fondöten 130G Panna Cotta | | |
+Huda Beauty | #FauxFilter Luminous Matte Fondöten 200B Shortbread | | |
+Huda Beauty | #FauxFilter Luminous Matte Fondöten 210B Chai | | |
+Huda Beauty | #FauxFilter Luminous Matte Fondöten 245B Peaches N Cream | | |
+Huda Beauty | #FauxFilter Luminous Matte Fondöten 250G Cheesecake | | |
+Huda Beauty | #FauxFilter Luminous Matte Fondöten 340G Baklava | | |
+Huda Beauty | #FauxFilter Luminous Matte Fondöten 420G Toffee | | |
+Sheglam | Mirror Kiss Shine Stick Ruj Rule Breaker | | |
+Sheglam | Mirror Kiss Shine Stick Ruj Own Your Shine | | |
+Sheglam | Mirror Kiss Shine Stick Ruj 111 High Key | | |
+Sheglam | Dynamatte Boom Matte Stick Ruj Don't Hesitate | | |
+Sheglam | Dynamatte Boom Matte Stick Ruj Encore Energy | | |
+Sheglam | Lip Veil Cushion Stick Ruj High Key | | |
+Sheglam | Lip Veil Cushion Stick Ruj Gotcha | | |
+Sheglam | Matte Allure Likit Ruj Doll House | | |
+Sheglam | Matte Allure Likit Ruj Millionaire | | |
+Sheglam | Matte Allure Likit Ruj Crimson | | |
+Sheglam | Matte Allure Likit Ruj Bougie | | |
+Sheglam | Pout Perfect Plumper Ruj 115 First Crush | | |
+Sheglam | Pout-Perfect Shine Lip Plumper Dudak Dolgunlaştırıcı Makin' Me Blush | | |
+Sheglam | Pout-Perfect Shimmer Lip Plumper Dudak Dolgunlaştırıcı Sugar Crystal | | |
+Sheglam | Bold Booster Lip Plumper Dudak Dolgunlaştırıcı Blush Drizzle | | |
+Sheglam | Hot Goss Plumping Lip Gloss Dudak Parlatıcısı That's Juicy! | | |
+Sheglam | Glass Lock Air Dudak Parlatıcısı French Toast | | |
+Sheglam | Glass Lock Air Dudak Parlatıcısı Sepia Kiss | | |
+Sheglam | Glass Lock Air Dudak Parlatıcısı Strawberry Milk | | |
+Sheglam | Glass Lock Air Dudak Parlatıcısı High Key | | |
+Sheglam | Fall In Line Stain Dudak Parlatıcısı 010 Mauvelous | | |
+Sheglam | Fall In Line Stain Dudak Parlatıcısı 011 Brownie Points | | |
+Sheglam | Fall In Line Stain Dudak Parlatıcısı 110 Pinky Promise | | |
+Sheglam | Bounce Putty Lip Pot Dudak Parlatıcısı 111 High Key | | |
+Sheglam | Bounce Putty Lip Pot Dudak Parlatıcısı 518 Cocoa Crush | | |
+Sheglam | Bounce Putty Lip Pot Dudak Parlatıcısı Peachy Pie | | |
+Sheglam | Bounce Putty Lip Pot Dudak Parlatıcısı Cherry Cheer | | |
+Sheglam | Hydra Jelly Lip Jam Dudak Parlatıcısı 106 Guava Glow | | |
+Sheglam | Hydra Jelly Lip Jam Dudak Parlatıcısı 515 Fig Flirt | | |
+Sheglam | Jelly Wow Dudak Yağı Berry Involved | | |
+Sheglam | Jelly Wow Dudak Yağı Loco For Coco | | |
+Sheglam | For The Flush Lip & Cheek Tint Dudak ve Yanak Rengi Cherry Picked | | |
+Sheglam | Color Bloom Likit Allık 006 Petal Talk | | |
+Sheglam | Color Bloom Likit Allık 301 Real Deal | | |
+Sheglam | Color Bloom Likit Allık Love Cake | | |
+Sheglam | Color Bloom Likit Allık Rose Ritual | | |
+Sheglam | Color Bloom Likit Allık Hot Topic | | |
+Sheglam | Color Bloom Likit Allık Risky Business | | |
+Sheglam | Sun Sculpt Liquid Contour Likit Kontür 07 Tawny Amber | | |
+Sheglam | Sun Sculpt Liquid Contour Likit Kontür 10 Warm Honey | | |
+Sheglam | Sun Sculpt Liquid Contour Likit Kontür Clay | | |
+Sheglam | Sun Beam Matte Liquid Bronzer 05 Golden Sun | | |
+Sheglam | Buttery Buff Stick Allık 01 Soft Tan | | |
+Sheglam | Buttery Buff Stick Allık 12 Terracotta | | |
+Sheglam | Lunar Orbit Blush Ball Krem Allık Atmosphere | | |
+Sheglam | Lunar Orbit Blush Ball Krem Allık Adorn | | |
+Sheglam | Ember Rose Krem Allık Eternal Flame | | |
+Sheglam | Complexion Boost Likit Kapatıcı Fair | | |
+Sheglam | Complexion Boost Likit Kapatıcı Chantilly | | |
+Sheglam | Complexion Boost Likit Kapatıcı Shell | | |
+Sheglam | Complexion Boost Likit Kapatıcı Linen | | |
+Sheglam | Complexion Boost Likit Kapatıcı Buttercream | | |
+Sheglam | Complexion Boost Likit Kapatıcı Nude | | |
+Sheglam | Complexion Boost Likit Kapatıcı Earth | | |
+Sheglam | Like Magic 12H Full Coverage Kapatıcı Shell | | |
+Sheglam | Like Magic 12H Full Coverage Kapatıcı Chantilly | | |
+Sheglam | Lock & Go Cushion Fondöten Chantilly | | |
+Sheglam | Insta Ready Powder Duo Pudra 00 Translucent | | |
+Sheglam | Baked Glow Sabitleyici Toz Pudra Translucent | | |
+Sheglam | Go Go Glow Body Mist Aydınlatıcı 80 Gilded Glow | | |
+Sheglam | Buttery Bling Stick Aydınlatıcı Vanilla Frost | | |
+Sheglam | Buttery Bling Stick Aydınlatıcı Gold Rings | | |
+Sheglam | Glow Bloom Likit Aydınlatıcı Vanilla Frost | | |
+Sheglam | Chroma Glow Bloom Likit Aydınlatıcı Flying Comet | | |
+Sheglam | Lunar Glow Aydınlatıcı Neutron Star | | |
+Sheglam | Lunar Glow Aydınlatıcı Vanilla Frost | | |
+Sheglam | Jelly Glaze Stick Far Golden Girl | | |
+Sheglam | Jelly Glaze Stick Far Champagne Gleam | | |
+Sheglam | Creamsicle Stick Far Daydream | | |
+Sheglam | Creamsicle Stick Far Lush | | |
+Sheglam | Matinee In LA Far Paleti | | |
+Sheglam | Showtime In Seattle Far Paleti | | |
+Sheglam | Peach Perfection Far Paleti | | |
+Sheglam | Mauve Mood Far Paleti | | |
+Sheglam | Essential Square Quad-Veil Far Paleti | | |
+Sheglam | The Essentials Pocket Fortune Far Paleti | | |
+Sheglam | The Essentials Pocket Veil Far Paleti | | |
+Sheglam | Daydreamer Mini Cloudy Sundae Far Paleti | | |
+Sheglam | Daydreamer Mini Teddy Meringue Far Paleti | | |
+Sheglam | Daydreamer Mini Pillow Fluff Far Paleti | | |
+Sheglam | Airy Tinted Volumizing Brow Mousse Kaş Sabitleyici Taupe | | |
+Sheglam | Airy Tinted Volumizing Brow Mousse Kaş Sabitleyici Auburn | | |
+Sheglam | Airy Tinted Volumizing Brow Mousse Kaş Sabitleyici Espresso | | |
+Sheglam | Airy Tinted Volumizing Brow Mousse Kaş Sabitleyici Chocolate | | |
+Sheglam | Brow-Fection Brush Dip Kaş Maskarası 06 Auburn | | |
+Sheglam | Brow-Fection Brush Dip Kaş Maskarası 08 Chocolate | | |
+Sheglam | Brow-Fection Brush Dip Kaş Maskarası 10 Truffle | | |
+Sheglam | Insta-Fill Brow Kaş Kalemi 07 Ash Brown | | |
+Sheglam | On Demand 2 In 1 Brow Kaş Kalemi 03 Taupe | | |
+Sheglam | On Demand 2 In 1 Brow Kaş Kalemi 06 Auburn | | |
+Sheglam | Lashlighter Infinite Tubing Maskara Black | | |
+Sheglam | Lashlighter Mega Boost Maskara Black | | |
+Sheglam | Lashlighter Up & Out Waterproof Maskara Black | | |
+Sheglam | All-In-One Volume & Length Waterproof Maskara Black | | |
+Sheglam | All-In-One Volume & Length Waterproof Maskara Macchiato | | |
+Sheglam | All-In-One 24K Multi Effect Waterproof Maskara Black | | |
+Sheglam | Bold Moves Kohl Cream Göz Kalemi Black | | |
+Sheglam | Oh So Rich Waterproof Matte Kalem Eyeliner Black | | |
+Sheglam | Foam Tip Kohl Eyeliner Burgundy | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 201 | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 203 | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 205 | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 208 | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 211 | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 216 | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 217 | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 222 | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 223 | | |
+Emily | Long Lasting Lip Pencil Dudak Kalemi 226 | | |
+Emily | Automatic Lipliner Dudak Kalemi 207 Gül Kurusu | | |
+Wibo | Million Dollar Lips Mat Likit Ruj 1 | | |
+Wibo | Million Dollar Lips Mat Likit Ruj 4 | | |
+Wibo | Million Dollar Lips Mat Likit Ruj 6 | | |
+Wibo | Million Dollar Lips Mat Likit Ruj 8 | | |
+Wibo | Glossy Nude Ruj Nude | | |
+Wibo | Spicy Lip Gloss Dudak Parlatıcı 19 | | |
+Wibo | Wonderfull Lips Top Coat Dudak Parlatıcı 2 | | |
+Wibo | Nude Lips Dudak Kalemi 2 | | |
+Wibo | Nude Lips Dudak Kalemi 3 | | |
+Wibo | Nude Lips Dudak Kalemi 4 | | |
+Wibo | Nude Lips Dudak Kalemi 5 | | |
+Wibo | Nude Lips Dudak Kalemi 6 | | |
+Wibo | Million Dollar Matt Dudak Kalemi 9 | | |
+Wibo | Skin Perfector Longwear Fondöten 01C Alabaster | | |
+Wibo | Skin Perfector Longwear Fondöten 02W Fair | | |
+Wibo | Skin Perfector Longwear Fondöten 03N Beige | | |
+Wibo | Skin Perfector Longwear Fondöten 04N Natural | | |
+Wibo | Skin Perfector Longwear Fondöten 05W Golden | | |
+Wibo | Skin Perfector Longwear Fondöten 06C Sand | | |
+Wibo | Skin Perfector Longwear Fondöten 07N Tanned | | |
+Wibo | Skin Perfector Longwear Fondöten 08W Toffee | | |
+Wibo | Skin Filter Luminous Fondöten 01 | | |
+Wibo | Skin Filter Luminous Fondöten 02 | | |
+Wibo | Skin Filter Luminous Fondöten 03 | | |
+Wibo | Boho Woman 2in1 Fondöten 2 Nude | | |
+Wibo | Forever Better Skin Camouflage Kapatıcı 01 | | |
+Wibo | Forever Better Skin Camouflage Kapatıcı 02 | | |
+Wibo | Forever Better Skin Camouflage Kapatıcı 03 | | |
+Wibo | Forever Better Skin Camouflage Kapatıcı 04 | | |
+Wibo | Forever Better Skin High Coverage Kapatıcı 1 | | |
+Wibo | Forever Better Skin High Coverage Kapatıcı 2 | | |
+Wibo | Forever Better Skin High Coverage Kapatıcı 3 | | |
+Wibo | Forever Better Skin High Coverage Kapatıcı 4 | | |
+Wibo | 4in1 Concealer Palette Kapatıcı Paleti | | |
+Wibo | Million Dollar Waterproof Eyeliner Black | | |
+Wibo | Million Dollar Bouncy Highlighter Aydınlatıcı | | |
+Wibo | Million Dollar Body Bronzing Highlighter Aydınlatıcı | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 001 Pearl | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 002 Ice | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 003 Moon | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 004 Silk | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 005 Petal | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 006 Reef | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 007 Amber | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 008 Stone | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 009 Topaz | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 010 Crystal | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 016 Rust | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 017 Copper | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 020 Sun | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 021 Gummy Bear | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 022 Peach Ring | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 023 Sweet Heart | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 024 Bubblegum | | |
+Maybelline | Lifter Gloss Dudak Parlatıcı 025 Taffy | | |
+L'Oréal Paris | True Match Fondöten 1.R/1.C Rose Ivory | | |
+L'Oréal Paris | True Match Fondöten 1.N Ivory | | |
+L'Oréal Paris | True Match Fondöten 1.5.N Linen | | |
+L'Oréal Paris | True Match Fondöten 2.N Vanilla | | |
+L'Oréal Paris | True Match Fondöten 2.R Rose Vanilla | | |
+L'Oréal Paris | True Match Fondöten 3.N Creamy Beige | | |
+L'Oréal Paris | True Match Fondöten 3.R/3.C Beige Rose | | |
+L'Oréal Paris | True Match Fondöten 4.W | | |
+L'Oréal Paris | True Match Fondöten 4.N Beige | | |
+L'Oréal Paris | True Match Fondöten 5.N Sand | | |
+L'Oréal Paris | True Match Fondöten 5.R/5.C Sable Rose | | |
+Pastel | Daylong Lipcolor Kissproof Likit Ruj 15 Marina | | |
+NYX | Butter Gloss Dudak Parlatıcı 05 Crème Brulee | | |
+NYX | Butter Gloss Dudak Parlatıcı 07 Tiramisu | | |
+NYX | Butter Gloss Dudak Parlatıcı 13 Fortune Cookie | | |
+NYX | Butter Gloss Dudak Parlatıcı 14 Madeleine | | |
+NYX | Butter Gloss Dudak Parlatıcı 15 Angel Food Cake | | |
+NYX | Butter Gloss Dudak Parlatıcı 16 Praline | | |
+NYX | Butter Gloss Dudak Parlatıcı 17 Ginger Snap | | |
+NYX | Butter Gloss Dudak Parlatıcı 45 Sugar High | | |
+NYX | Butter Gloss Dudak Parlatıcı Bit Of Honey | | |
+NYX | Butter Gloss Dudak Parlatıcı Vanilla Cream Pie | | |
+NYX | Butter Gloss Dudak Parlatıcı Éclair | | |
+NYX | Butter Gloss Dudak Parlatıcı Sorbet | | |
+NYX | Butter Gloss Dudak Parlatıcı Butterscotch | | |
+NYX | Butter Gloss Dudak Parlatıcı Strawberry Cheesecake | | |
+NYX | Butter Gloss Dudak Parlatıcı Cinnamon Roll | | |
+NYX | Butter Gloss Dudak Parlatıcı Spiked Toffee | | |
+NYX | Butter Gloss Dudak Parlatıcı Apple Crisp | | |
+NYX | Butter Gloss Dudak Parlatıcı Rocky Road | | |
+NYX | Butter Gloss Dudak Parlatıcı Peaches And Cream | | |
+NYX | Butter Gloss Dudak Parlatıcı Peach Cobbler | | |
+NYX | Butter Gloss Dudak Parlatıcı Cherry Cheesecake | | |
+NYX | Butter Gloss Dudak Parlatıcı Maple Blondie | | |
+NYX | Butter Gloss Dudak Parlatıcı Sugar Cookie | | |
+NYX | Butter Gloss Dudak Parlatıcı Raspberry Tart | | |
+Dove | Deeply Nourishing Nemlendirici Duş Jeli 500 ml | | |
+Dove | Deeply Nourishing Duş Jeli 450 ml | | |
+Dove | Hindistan Cevizi ve Badem Sütü Duş Jeli 500 ml | | |
+Dove | Lotus Çiçeği ve Pirinç Sütü Duş Jeli 500 ml | | |
+Dove | Avokado Yağı ve Kalendula Duş Jeli 500 ml | | |
+Dove | Lavanta ve Biberiye Duş Jeli 500 ml | | |
+Dove | Mango & Badem Duş Jeli 450 ml | | |
+Dove | Men+Care Clean Comfort Duş Jeli 400 ml | | |
+Dove | Men+Care Eucalyptus + Mint Duş Jeli 400 ml | | |
+Dove | Men+Care Sandalwood + Vanilla Duş Jeli 400 ml | | |
+Dove | Duş Köpüğü 200 ml | | |
+Dove | Hindistan Cevizi Yağı ve Badem Sütü Sıvı Sabun 500 ml | | |
+Dove | Avokado ve Kalendula Özlü Sıvı Sabun 450 ml | | |
+Dove | Lotus Çiçeği Sıvı Sabun 450 ml | | |
+Dove | Aloe Vera Kepek Karşıtı Bakım Şampuan 400 ml | | |
+Dove | Yoğun Onarıcı Yıpranmış Saçlar İçin Şampuan 400 ml | | |
+Dove | Güçlendirici Bakım Hindistan Cevizi Yağı ve Zerdeçal Şampuan | | |
+Dove | Matcha ve Yasemin Çiçeği Sprey Deodorant 150 ml | | |
+The Bath Factory | Liberty Vücut Losyonu 200 ml | | |
+The Bath Factory | Liberty Vücut Spreyi 200 ml | | |
+The Bath Factory | Liberty Eau De Parfüm 50 ml | | |
+The Bath Factory | Sweet Vanilla Vücut Losyonu 200 ml | | |
+The Bath Factory | Sweet Vanilla Vücut Spreyi 200 ml | | |
+The Bath Factory | Gold Aura Vücut Spreyi 200 ml | | |
+The Bath Factory | Gold Aura Duş Jeli 400 ml | | |
+The Bath Factory | Gold Aura Vücut Peelingi 300 gr | | |
+The Bath Factory | Gold Aura El Yüz Vücut Sabunu 80 gr | | |
+The Bath Factory | Vücut Peelingi Vanilya Aromalı 300 gr | | |
+The Bath Factory | Vücut Peelingi Dolce Lychee 300 gr | | |
+The Bath Factory | Muzlu Duş Jeli 400 ml | | |
+The Bath Factory | Çilekli Duş Jeli 400 ml | | |
+The Bath Factory | Lemon Cheesecake Duş Jeli 400 ml | | |
+The Bath Factory | Dark Amber Duş Jeli 400 ml | | |
+The Bath Factory | Hawaiian Coconut Duş Jeli 400 ml | | |
+The Bath Factory | Hamam Duş Jeli 400 ml | | |
+The Bath Factory | Zeytinyağlı Duş Jeli 400 ml | | |
+The Bath Factory | Linden Garden Duş Jeli 400 ml | | |
+The Bath Factory | Turunç Duş Jeli 400 ml | | |
+The Bath Factory | Marvel Rose Duş Jeli 400 ml | | |
+The Bath Factory | Vanilya Duş Jeli 400 ml | | |
+The Bath Factory | El Yüz Vücut Sabunu Vanilya 80 gr | | |
+Elidor | Superblend Biotin Argan Yağı Arjinin Şampuan 650 ml | | |
+Elidor | Superblend Brezilya Keratin Terapisi Şampuan 400 ml | | |
+Elidor | Superblend Anında Onarıcı Bakım Şampuan 400 ml | | |
+Elidor | Superblend Saç Dökülmelerine Karşı Şampuan 400 ml | | |
+Elidor | Superblend Renk Koruyucu ve Canlandırıcı Bakım Şampuan 400 ml | | |
+Elidor | Superblend 2'si 1 Arada Kepeğe Karşı Şampuan 400 ml | | |
+Elidor | Güçlü ve Parlak Şampuan 400 ml | | |
+Elidor | Güçlü ve Parlak Şampuan 650 ml | | |
+Elidor | Sağlıklı Uzayan Saçlar Şampuan 400 ml | | |
+Elidor | Anında Onarıcı Bakım Şampuan 650 ml | | |
+Elidor | İpek Terapisi Şampuan 400 ml | | |
+Elidor | İpek Terapisi Saç Bakım Kremi 350 ml | | |
+Elidor | Ultra Işıltı Şampuan 400 ml | | |
+Elidor | Ultra Işıltı Saç Bakım Kremi 350 ml | | |
+Elidor | Summer Rescue S.O.S Şampuan 400 ml | | |
+Elidor | Hindistan Cevizi Yumuşaklığı Şampuan 400 ml | | |
+Elidor | Brezilya Keratin Terapisi Serum Bakım Kremi 350 ml | | |
+Elidor | 7/24 Belirgin Bukleler Şekillendirici Bakım Kremi 240 ml | | |
+Rexona | Thermocool Frozen Acai & Jasmine Kadın Sprey Deodorant 150 ml | | |
+Rexona | Thermocool Eucalyptus & Magnolia Kadın Sprey Deodorant 150 ml | | |
+Rexona | Stay Fresh Kadın Sprey Deodorant 150 ml | | |
+Rexona | Invisible Beyaz İz Sarı Leke Karşıtı Kadın Sprey Deodorant 150 ml | | |
+Rexona | Invisible Fresh Deep Kadın Sprey Deodorant 150 ml | | |
+Rexona | Shower Fresh Kadın Sprey Deodorant 150 ml | | |
+Rexona | Sexy Bouquet Kadın Sprey Deodorant 150 ml | | |
+Rexona | %0 Alüminyum Ocean Fresh Kadın Sprey Deodorant 150 ml | | |
+Rexona | Clinical Protection Confidence Kadın Sprey Deodorant 150 ml | | |
+Rexona | Clinical Protection Confidence Kadın Stick Deodorant 45 ml | | |
+Rexona | Clinical Clean Stick Protection Shower Clean Kadın Stick 45 ml | | |
+Rexona | Men Xtra Cool Erkek Sprey Deodorant 200 ml | | |
+Rexona | Men Motionsense Cobalt Dry Erkek Stick Deodorant 50 ml | | |
+Nivea | Pearl & Beauty Kadın Sprey Deodorant 150 ml | | |
+Nivea | Pearl & Beauty Kadın Roll-On 50 ml | | |
+Nivea | Black & White Invisible Clear Kadın Sprey Deodorant 150 ml | | |
+Nivea | Black & White Invisible Pure Kadın Roll-On 50 ml | | |
+Nivea | Black & White Invisible İpeksi Pürüzsüzlük Kadın Roll-On 50 ml | | |
+Nivea | Fresh Natural Kadın Roll-On 50 ml | | |
+Nivea | Fresh Sensation Kadın Roll-On 50 ml | | |
+Nivea | Powder Touch Kadın Roll-On 50 ml | | |
+Nivea | Fresh Orange Sprey Deodorant 150 ml | | |
+Nivea | Men Fresh Active Sprey Deodorant 150 ml | | |
+Nivea | Men Invisible Black & White Sprey Deodorant 150 ml | | |
+Nivea | Men Deep Dimension Roll-On 50 ml | | |
+Nivea | Men Cool Kick Roll-On 50 ml | | |
+Nivea | Men Derma Control Clinical Roll-On 50 ml | | |
+Nivea | Creme Nemlendirici Krem 150 ml | | |
+Nivea | Creme Nemlendirici Krem 250 ml | | |
+Nivea | Men Creme Nemlendirici Krem 75 ml | | |
+Nivea | Creme Soft Kremsi Dokunuş Duş Jeli 750 ml | | |
+Nivea | Creme Care Duş Jeli | | |
+Nivea | Men Sport Duş Jeli 500 ml | | |
+Nivea | Men Deep Duş Jeli 500 ml | | |
+Nivea | Men Boost Duş Jeli 500 ml | | |
+Nivea | Kiraz Çiçeği & Jojoba Yağı Vücut Losyonu 400 ml | | |
+Nivea | E Vitamini Deniz İğdesi El ve Tırnak Kremi 75 ml | | |
+Nivea | Med Protection Dudak Bakım Kremi 4.8 gr | | |
+Nivea | Lip Stick Çilek Dudak Bakımı | | |
+Nivea | Sun Koruma & Nem SPF 50 Güneş Spreyi 200 ml | | |
+Nivea | Derma Skin Clear Yüz Temizleme Jeli | | |
+Nivea | Cellular Yaşlanma Karşıtı Krem SPF30 50 ml | | |
+Nivea | Men Hassas Tıraş Köpüğü 200 ml | | |
+Nivea | Men Sensitive Tıraş Jeli 200 ml | | |
+Head & Shoulders | 2'si 1 Arada Kepek Karşıtı Şampuan Klasik Bakım 400 ml | | |
+Head & Shoulders | 2'si 1 Arada Kepek Karşıtı Şampuan İpeksi Yumuşaklık 400 ml | | |
+Head & Shoulders | 2'si 1 Arada Kepek Karşıtı Şampuan Mentol Ferahlığı 400 ml | | |
+Head & Shoulders | 2'si 1 Arada Erkeklere Özel Saç Dökülmelerine Karşı 400 ml | | |
+Head & Shoulders | Kadınlara Özel Saç Dökülmelerine Karşı Şampuan 400 ml | | |
+Head & Shoulders | Kadınlara Özel Dökülme ve Kepek Karşıtı Kafein Etkili Şampuan 330 ml | | |
+Head & Shoulders | Limon Ferahlığı Şampuan 400 ml | | |
+Head & Shoulders | Nemlendirici Bakım Şampuanı 400 ml | | |
+Head & Shoulders | Besleyici Bakım Şampuan 400 ml | | |
+Head & Shoulders | Derinlemesine Temiz Kaşıntı Giderici Nane Şampuan 400 ml | | |
+Head & Shoulders | Men Ultra Saç Dökülmelerine Karşı Şampuan 400 ml | | |
+Head & Shoulders | Men Ultra Maksimum Yağlanma Kontrolü Şampuan 400 ml | | |
+Head & Shoulders | Clinical Strength Kepek Şampuanı 400 ml | | |
+Head & Shoulders | Clinical Strength Dry Scalp Rescue Şampuan 400 ml | | |
+Head & Shoulders | Klasik Bakım Şampuan 800 ml | | |
+Duru | Body Scrub Duş Jeli 450 ml | | |
+Le Petit Marseillais | Duş Jeli 400 ml | | |
+Le Petit Marseillais | Duş Jeli 650 ml | | |
+Axe | Dark Temptation Erkek Sprey Deodorant 150 ml | | |
+Axe | Dark Temptation XL Erkek Sprey Deodorant 200 ml | | |
+Axe | Dark Temptation Roll-On 50 ml | | |
+Axe | Dark Temptation EDT Erkek Parfüm 100 ml | | |
+Axe | Black Erkek Sprey Deodorant 150 ml | | |
+Axe | Black EDT Erkek Parfüm 100 ml | | |
+Axe | Apollo Erkek Sprey Deodorant 150 ml | | |
+Axe | Apollo Erkek Sprey Deodorant 200 ml | | |
+Axe | Ice Chill Erkek Sprey Deodorant 150 ml | | |
+Axe | Ice Chill EDT Erkek Parfüm 50 ml | | |
+Axe | Africa Erkek Roll-On 50 ml | | |
+Axe | Cherry Spritz Erkek Sprey Deodorant 150 ml | | |
+Axe | Cocoa Velvet Erkek Sprey Deodorant 150 ml | | |
+Axe | Marshmallow Smoke Erkek Sprey Deodorant 150 ml | | |
+Axe | Leather & Cookies Erkek Sprey Deodorant 150 ml | | |
+Axe | Marine Erkek Deodorant 150 ml | | |
+Axe | Gold Erkek Sprey Deodorant 150 ml | | |
+Axe | Anarchy For Him Deodorant 150 ml | | |
+Axe | Sunset Fresh Erkek Sprey Deodorant 150 ml | | |
+Axe | Premium Collection Black Vanilla Erkek Sprey Deodorant 150 ml | | |
+Axe | Premium Collection Blue Lavender Erkek Sprey Deodorant 150 ml | | |
+Axe | Premium Collection Copper Santal Erkek Sprey Deodorant 150 ml | | |
+Axe | Premium Collection Emerald Sage Erkek Sprey Deodorant 150 ml | | |
+Axe | Premium Collection Copper Santal 3 in 1 Duş Jeli 300 ml | | |
+Axe | Milyarder Duş Jeli 250 ml | | |
+Old Spice | Captain Erkek Stick Deodorant 50 ml | | |
+Old Spice | Original Stick Deodorant 50 ml | | |
+Old Spice | Wolfthorn Stick Deodorant 50 ml | | |
+Old Spice | Whitewater Stick Deodorant 85 ml | | |
+Old Spice | Deep Sea Stick Deodorant 65 ml | | |
+Old Spice | Cold Spice Clear Gel 70 ml | | |
+Old Spice | Wolfthorn 3 in 1 Duş Jeli Şampuan 400 ml | | |
+Old Spice | Rockstar 3 in 1 Şampuan + Duş Jeli 400 ml | | |
+Old Spice | Bearglove Duş Jeli & Şampuan 400 ml | | |
+Gillette | Mach3 Tıraş Makinesi + Yedek Tıraş Bıçağı | | |
+Gillette | Mach3 Yedek Tıraş Bıçağı 8'li | | |
+Gillette | Mach3 Charcoal Kömür Etkili Makine + Yedek Tıraş Bıçağı | | |
+Gillette | Mach3 Kömür Yedek Tıraş Bıçağı 2'li | | |
+Gillette | Mach3 Start Tıraş Makinesi + 3 Yedek Bıçak | | |
+Gillette | Mach3 Turbo Tıraş Bıçağı | | |
+Gillette | Fusion5 ProShield Tıraş Makinesi | | |
+Gillette | Fusion5 ProShield Yedek Bıçak 4'lü | | |
+Gillette | Fusion5 ProShield Chill Tıraş Bıçağı | | |
+Gillette | Fusion5 ProGlide Flexball Tıraş Makinesi | | |
+Gillette | Blue3 Kullan At Tıraş Bıçağı 3'lü | | |
+Gillette | Blue3 Milli Takım Özel Paketi 8'li Tıraş Bıçağı | | |
+Gillette | Blue3 Comfort Tıraş Bıçağı | | |
+Gillette | Blue3 Cool Tıraş Bıçağı | | |
+Gillette | Blue3 Nitro Kullan At Tıraş Bıçağı 6+2'li | | |
+Gillette | Blue3 Hybrid Tıraş Makinesi | | |
+Gillette | Klasik Bakım Tıraş Köpüğü 200 ml | | |
+Gillette | Complete Defense Tıraş Jeli 75 ml | | |
+Arko Men | Coffee Tıraş Köpüğü 200 ml | | |
+Arko Men | Black Serisi Tıraş Köpüğü 200 ml | | |
+Arko Men | Energy Tıraş Köpüğü 200 ml | | |
+Arko Men | Cool Tıraş Köpüğü 200 ml | | |
+Arko Men | Cool Tıraş Köpüğü 100 ml | | |
+Arko Men | Sensitive Tıraş Köpüğü 200 ml | | |
+Arko Men | Anti-Irritation Tıraş Köpüğü 200 ml | | |
+Arko Men | Nostalji Özel Tıraş Köpüğü 200 ml | | |
+Arko Men | 60. Yıl Özel Tıraş Köpüğü 200 ml | | |
+Arko Men | Cool Tıraş Kremi 90 g | | |
+Arko Men | Cool Tıraş Kremi 100 g | | |
+Clear | Men 3 in 1 Şampuan & Duş Jeli Ferahlatıcı Mentol 350 ml | | |
+Clear | Men 3 in 1 Şampuan & Duş Jeli Arındırıcı Kömür 350 ml | | |
+Clear | Men Saç Dökülmesine Karşı Kahve Çekirdeği Özü Şampuan 350 ml | | |
+Clear | Men Yoğun Arındırıcı Kömür Şampuan 350 ml | | |
+Clear | Men Günlük Arınma ve Ferahlık Sedir Ağacı ve Okaliptus Şampuan 350 ml | | |
+Clear | Men Hızlı Stil 2'si 1 Arada Şampuan 350 ml | | |
+Clear | Men Maksimum Ferahlık Limon Özlü Şampuan 350 ml | | |
+Clear | Men Cool Sport Menthol Şampuan 350 ml | | |
+Clear | Men Legend CR7 Şampuan 350 ml | | |
+Clear | Men Legends Kenan Yıldız Ultra Hacim Şampuan 350 ml | | |
+Blade | Cool Fresh Erkek Sprey Deodorant 200 ml | | |
+Blade | Cool Fresh Roll-On 50 ml | | |
+Blade | Green Dream Erkek Sprey Deodorant 200 ml | | |
+Blade | Green Dream Roll-On 50 ml | | |
+Blade | Ai Deodorant 150 ml | | |
+Blade | Deep Chill Deodorant 150 ml | | |
+Blade | Self Confidence Deodorant 150 ml | | |
+Blade | Marine Fresh Deodorant 150 ml | | |
+Blade | Whole Body Deodorant Energy Boost 150 ml | | |
+Blade | Hero Selection Night Fire Deodorant 150 ml | | |
+Blade | Faster EDT + 2 Deodorant Kofre | | |
+Brut | Original Erkek Sprey Deodorant 200 ml | | |
+Nivea | Men Fresh Active Sprey Deodorant 75 ml | | |
+Nivea | Men Cool Kick Fresh Sprey Deodorant 150 ml | | |
+Nivea | Men Invisible Erkek Sprey Deodorant 150 ml | | |
+Jagler | Klasik Erkek Deodorant Sprey 150 ml | | |
+Pantene | Güç ve Parlaklık Şampuan 400 ml | | |
+Pantene | Güç ve Parlaklık 3'ü 1 Arada Şampuan 400 ml | | |
+Pantene | Onarıcı & Koruyucu 3'ü 1 Arada Şampuan 400 ml | | |
+Pantene | Dökülme Karşıtı 3'ü 1 Arada Şampuan 400 ml | | |
+Pantene | Kepek Karşıtı Şampuan 400 ml | | |
+Pantene | Kesintisiz Nem Takviyesi Şampuan 400 ml | | |
+Pantene | Pro-V AquaLight Şampuan Yağlı Saçlar İçin 400 ml | | |
+Pantene | Pro-V Micellar Temizliği Şampuan 400 ml | | |
+Pantene | Uzun ve Güçlü Şampuan Bambu ve Biyotinli 400 ml | | |
+Pantene | Silikonsuz Hacim Veren Dolgunlaştırıcı Şampuan Biotin ve Gül Suyu 400 ml | | |
+Elseve | Mucizevi Yağ Besleyici Bakım Şampuanı 300 ml | | |
+Elseve | Mucizevi Yağ Besleyici Bakım Şampuanı 390 ml | | |
+Elseve | Mucizevi Yağ Besleyici Bakım Şampuanı 700 ml | | |
+Elseve | Mucizevi Yağ Saç Kremi Kuru Sert Saçlar 150 ml | | |
+Elseve | Hydra Hyaluronic Nem Dolduran Bakım Şampuanı 300 ml | | |
+Elseve | Hydra Hyaluronic Nem Dolduran Bakım Kremi 250 ml | | |
+Elseve | Hydra Hyaluronic Pure Yağlanma Karşıtı Saç Kremi 250 ml | | |
+Elseve | Komple Direnç Dökülme Karşıtı Bakım Şampuanı 300 ml | | |
+Elseve | Glycolic Gloss Parlaklık Veren Bakım Şampuanı 300 ml | | |
+Elseve | Growth Booster Döküntü Karşıtı Şampuan 200 ml | | |
+Elseve | Collagen Lifter Saç Kremi 250 ml | | |
+Gliss | Summer Repair Şampuan 400 ml | | |
+Gliss | Supreme Length Şampuan 400 ml | | |
+Gliss | Full Hair Wonder Şampuan 400 ml | | |
+Gliss | Scalp Balance Nazik Bakım Şampuanı 200 ml | | |
+Gliss | Oil Nutritive Şampuan 400 ml | | |
+Gliss | Ultimate Repair Şampuan 400 ml | | |
+Gliss | Ultimate Repair Şampuan 525 ml | | |
+Gliss | Bio-Tech Restore Güçlendirici Şampuan 500 ml | | |
+Gliss | Aqua Revive Şampuan 400 ml | | |
+Gliss | Intense Therapy Şampuan 400 ml | | |
+Gliss | Intense Therapy Şampuan 525 ml | | |
+Gliss | Split Hair Miracle Şampuan 400 ml | | |
+Gliss | Serum Deep Repair Şampuan 400 ml | | |
+Garnier | Micellar Kusursuz Makyaj Temizleme Suyu 400 ml | | |
+Garnier | Micellar Kusursuz Makyaj Temizleme Suyu 200 ml | | |
+Garnier | Çift Fazlı Micellar Kusursuz Makyaj Temizleme Suyu 400 ml | | |
+Garnier | Besleyici Çift Fazlı Micellar Temizleme Suyu 400 ml | | |
+Garnier | Hyaluronik Aloe Micellar Makyaj Temizleme Suyu 400 ml | | |
+Garnier | Micellar Peeling Makyaj Temizleme Suyu 400 ml | | |
+Colgate | Hassasiyete Anında Çözüm Onarım ve Diş Minesi Güçlendirme Diş Macunu 75 ml | | |
+Colgate | Hassasiyete Anında Çözüm Onarım ve Diş Eti Bakımı Diş Macunu 75 ml | | |
+Colgate | Hassasiyete Anında Çözüm Onarım ve Hassas Beyazlık Diş Macunu 75 ml | | |
+Colgate | Hassasiyete Pro Çözüm Onarım ve Önleme Diş Macunu 75 ml | | |
+Colgate | Çürüklere Karşı Koruma Üçlü Etki Diş Macunu 150 ml | | |
+Sensodyne | Çok Yönlü Koruma Diş Macunu 50 ml | | |
+Sensodyne | Çok Yönlü Koruma Gelişmiş Beyazlık Diş Macunu 50 ml | | |
+Sensodyne | Klinik Beyazlık Güçlü Diş Minesi Diş Macunu 75 ml | | |
+Sensodyne | Onarım & Koruma Diş Macunu 75 ml | | |
+Sensodyne | Onarım & Koruma Beyazlatıcı Diş Macunu 75 ml | | |
+Sensodyne | Diş Eti Bakımı Diş Macunu 75 ml | | |
+Sensodyne | Deep Clean Diş Macunu 75 ml | | |
+Sensodyne | Herbal Diş Macunu 100 g | | |
+Domestos | Yoğun Kıvamlı Çamaşır Suyu Dağ Esintisi 750 ml | | |
+Domestos | Yoğun Kıvamlı Çamaşır Suyu Ultra Beyaz Maksimum Hijyen 3240 ml | | |
+Domestos | Yoğun Kıvamlı Çamaşır Suyu Sıfır Klor Orman Ferahlığı 675 ml | | |
+Domestos | Bio Active Çamaşır Suyu Mutfak Maksimum Hijyen 750 ml | | |
+Domestos | Köpük Gücü Çam Esintisi Çamaşır Suyu 450 ml | | |
+Domestos | Hijyenik Temizlik Spreyi Çok Amaçlı 750 ml | | |
+Domestos | Dağ Esintisi Çamaşır Suyu 5 lt | | |
+Domestos | Professional Çamaşır Suyu Ultra Kıvamlı 1250 ml | | |
+Bioderma | Sensibio H2O Misel Su 100 ml | | |
+Bioderma | Sensibio H2O Misel Su 250 ml | | |
+Bioderma | Sensibio H2O Misel Su 500 ml | | |
+Bioderma | Sensibio H2O Misel Su 850 ml | | |
+Bioderma | Sensibio H2O Eye 125 ml | | |
+Bioderma | Sensibio Foaming Jel 200 ml | | |
+Bioderma | Sensibio Foaming Jel 500 ml | | |
+Bioderma | Sensibio DS Cream 40 ml | | |
+Bioderma | Sebium H2O Misel Su 250 ml | | |
+Bioderma | Sebium H2O Misel Su 500 ml | | |
+Bioderma | Sebium Foaming Jel 500 ml | | |
+Bioderma | Sebium Mat Control 30 ml | | |
+Bioderma | Sebium Hydra Cream 40 ml | | |
+Bioderma | Sebium Kerato+ Jel Krem 30 ml | | |
+Bioderma | Hydrabio H2O Misel Su 500 ml | | |
+Bioderma | Atoderm Intensive Baume 200 ml | | |
+Bioderma | Atoderm Intensive Baume 500 ml | | |
+Bioderma | Atoderm Krem Ultra 500 ml | | |
+Bioderma | Pigmentbio Foaming Cream 200 ml | | |
+Bioderma | Photoderm Spot SPF50 150 ml | | |
+Bioderma | Cicabio El Kremi 50 ml | | |
+Neutrogena | Hydro Boost Water Jel Nemlendirici 50 ml | | |
+Neutrogena | Hydro Boost Water Jel Temizleyici 200 ml | | |
+Neutrogena | Hydro Boost Gece Kremi 50 ml | | |
+Neutrogena | Hydro Boost Pürüzsüzleştirici Peeling Jel 150 ml | | |
+Neutrogena | Hydro Boost Micellar Misel Su 400 ml | | |
+Neutrogena | Hydro Boost Makyaj Temizleme Mendili 25'li | | |
+Neutrogena | Hydro Boost El Kremi 50 ml | | |
+Neutrogena | Hydro Boost El Kremi 75 ml | | |
+Neutrogena | Visibly Clear Temizleme Jeli 200 ml | | |
+Neutrogena | Norveç Formülü Parfümlü El Kremi 75 ml | | |
+Neutrogena | Norveç Formülü Ultra Besleyici Bakım Kremi 200 ml | | |
+The Ordinary | Niacinamide 10% + Zinc 1% 30 ml | | |
+The Ordinary | Hyaluronic Acid 2% + B5 30 ml | | |
+The Ordinary | Glycolic Acid 7% Toning Solution | | |
+The Ordinary | AHA 30% + BHA 2% Peeling Solution | | |
+The Ordinary | Retinol 1% in Squalane | | |
+The Ordinary | Caffeine Solution 5% + EGCG | | |
+The Ordinary | Natural Moisturizing Factors + HA | | |
+The Ordinary | Azelaic Acid Suspension 10% | | |
+The Ordinary | Salicylic Acid 2% Anhydrous Solution | | |
+The Ordinary | Lactic Acid 10% + HA | | |
+The Ordinary | Multi-Peptide + HA Serum | | |
+The Ordinary | Soothing & Barrier Support Serum | | |
+The Ordinary | 100% Organic Cold-Pressed Moroccan Argan Oil | | |
+The Ordinary | Niacinamide 5% Face and Body Emulsion | | |
+Cetaphil | Nemlendirici Krem 85 g | | |
+Cetaphil | Moisturising Lotion 200 ml | | |
+Cetaphil | Gentle Exfoliating SA Temizleyici 237 ml | | |
+Cetaphil | Daily Facial Cleanser 473 ml | | |
+Cetaphil | Gentle Hassas Cilt Temizleyici 591 ml | | |
+Cetaphil | Rich Nemlendirici Yüz Kremi 48 g | | |
+Cetaphil | Healthy Radiance Antioxidant-C Serum 30 ml | | |
+Cetaphil | Eczema Restoraderm Nemlendirici Krem 227 g | | |
+Cetaphil | Nazik Temizleyici Sabun 127 g | | |
+Cetaphil | Bebek Yıkama Jeli ve Şampuanı 399 ml | | |
+Cif | Krem Yüzey Temizleyici Amonyak 750 ml | | |
+Cif | Krem Yüzey Temizleyici Sakura 750 ml | | |
+Cif | Krem Yüzey Temizleyici Limon 750 ml | | |
+Cif | Krem Altın Işıltısı Amber 750 ml | | |
+Cif | Krem Frezya ve Müge Çiçeği 750 ml | | |
+Cif | Krem Sprey Amonyak 750 ml | | |
+Cif | Krem Sprey Limon Ultra Yağ Çözücü 750 ml | | |
+Cif | Jel Cleanboost Çiçek Ferahlığı 750 ml | | |
+Cif | Jel Cleanboost Bahar Ferahlığı 750 ml | | |
+Cif | Jel Zemin Uzmanı Beyaz Sabun 750 ml | | |
+Yumoş | Extra Konsantre Yumuşatıcı Amber 1440 ml | | |
+Yumoş | Extra Konsantre Yumuşatıcı Şakayık 1440 ml | | |
+Yumoş | Extra Konsantre Yumuşatıcı Orkide 1440 ml | | |
+Yumoş | Extra Konsantre Yumuşatıcı Lilyum 1440 ml | | |
+Yumoş | Extra Konsantre Yumuşatıcı Manolya 1440 ml | | |
+Yumoş | Extra Konsantre Yumuşatıcı Lotus 1440 ml | | |
+Yumoş | Açık Hava Etkisi Nergis 1440 ml | | |
+Yumoş | Açık Hava Etkisi Mavi Gelincik 1440 ml | | |
+Yumoş | Comfort Spring Oda Spreyi 500 ml | | |
+Bref | Power Aktiv WC Blok Çam 2 x 50 g | | |
+Bref | Power Aktiv WC Blok Okyanus 2 x 50 g | | |
+Bref | Power Aktiv WC Blok Limon 2 x 50 g | | |
+Bref | Power Aktiv WC Blok Çiçek 2 x 50 g | | |
+Bref | Power Aktiv WC Blok Lavanta 2'li | | |
+Bref | Power Aktiv WC Blok Çam 3 x 50 g | | |
+Bref | Power Aktiv WC Blok Okyanus 3 x 50 g | | |
+Bref | Power Aktiv Jel Çiçek Ferahlığı 700 ml | | |
+Glade | Otomatik Sprey Yedek Temiz Çarşaf Ferahlığı 269 ml | | |
+Glade | Otomatik Sprey Yedek Oryantal Oud 269 ml | | |
+Glade | Otomatik Sprey Yedek Vanilya 269 ml | | |
+Glade | Otomatik Sprey Yedek Meyve Çiçek Buketi 269 ml | | |
+Glade | Otomatik Sprey Yedek Okyanus Sessizliği 269 ml | | |
+Glade | Otomatik Sprey Yedek Lavanta Ferahlığı 269 ml | | |
+Glade | Otomatik Sprey Cihaz ve Yedek | | |
+Air Wick | Freshmatic Yedek Lavanta 250 ml | | |
+Air Wick | Freshmatic Yedek Temizliğin Esintisi 250 ml | | |
+Air Wick | Freshmatic Yedek Şelale Serinliği 2'li | | |
+Air Wick | Freshmatic Yedek Bahar Çiçekleri 250 ml | | |
+Air Wick | Freshmatic Otomatik Sprey Makine | | |
+Air Wick | Aerosol Lavanta Esintisi 300 ml | | |
+Air Wick | Aerosol Manolya ve Kiraz Çiçekleri 300 ml | | |
+Air Wick | Elektrikli Oda Kokusu Yedek Beyaz Orkide | | |
+Febreze | Oda Kokusu Bahar Çiçekleri 300 ml | | |
+Febreze | Oda Kokusu Okyanus Esintisi 300 ml | | |
+Febreze | Oda Kokusu Dağ Esintisi 300 ml | | |
+Febreze | Oda Kokusu Lavanta Konforu 300 ml | | |
+Febreze | Oda Kokusu Tarçınlı Elma 300 ml | | |
+Febreze | Platinum Evcil Hayvan 300 ml | | |
+Febreze | Platinum Mistik Mezopotamya 300 ml | | |
+Febreze | Platinum Gizemli Tayland 300 ml | | |
+Febreze | Platinum Egzotik Amazon 300 ml | | |
+Febreze | Aerosol Japon Kiraz Çiçekleri 185 ml | | |
+Signal | White System Diş Macunu 75 ml | | |
+Signal | White System Güçlü Diş Minesi 75 ml | | |
+Signal | White System Arındırıcı Beyazlık 75 ml | | |
+Signal | White Now Original 75 ml | | |
+Signal | White Now Extra Fresh 75 ml | | |
+Signal | White Now Lekesiz Beyazlık 75 ml | | |
+Signal | White Now Color Correct 75 ml | | |
+Signal | Komple Bakım 8 Etki 75 ml | | |
+Ipana | 3 Boyutlu Beyazlık Luxe Perfection 75 ml | | |
+Ipana | 3 Boyutlu Beyazlık Luxe Göz Kamaştırıcı 75 ml | | |
+Ipana | 3 Boyutlu Beyazlık Luxe Intense 75 ml | | |
+Ipana | 3 Boyutlu Beyazlık Çay Kahve 75 ml | | |
+Ipana | 3 Boyutlu Beyazlık Nane Ferahlığı 75 ml | | |
+Ipana | 3DW Whitening Therapy Hassasiyet 75 ml | | |
+Ipana | 3DW Whitening Therapy Diş Minesi Koruma 75 ml | | |
+Ipana | Pro Sensitive 75 ml | | |
+Listerine | Cool Mint 500 ml | | |
+Listerine | Cool Mint Ekstra Hafif Tat 500 ml | | |
+Listerine | Cool Mint 80 ml | | |
+Listerine | Total Care 500 ml | | |
+Listerine | Total Care Ekstra Hafif Tat 500 ml | | |
+Listerine | Total Care Zero 500 ml | | |
+Listerine | Zero Alkolsüz 500 ml | | |
+Listerine | Advanced White Hafif Tat 500 ml | | |
+Listerine | Diş ve Diş Eti Koruması Hafif Tat 500 ml | | |
+Listerine | Stay White 500 ml | | |
+Gillette Venus | Klasik Tıraş Makinesi + 4'lü Yedek Bıçak | | |
+Gillette Venus | Smooth Sensitive Tıraş Makinesi + Yedek Başlık | | |
+Gillette Venus | Extra Smooth Swirl Tıraş Makinesi + Yedek Başlık | | |
+Gillette Venus | ComfortGlide Breeze Tıraş Makinesi + 2 Yedek Başlık | | |
+Gillette Venus | Breeze Yedek Bıçak 4'lü | | |
+Gillette Venus | Pro Comfort Glide Sugarberry Tıraş Makinesi | | |
+Gillette Venus | Miami Hibrid Tıraş Makinesi + Yedek | | |
+Gillette Venus | Bikini Bölgesi 3'lü Yedek Bıçak | | |
+Durex | Klasik Prezervatif 12'li | | |
+Durex | Yakın Hisset Prezervatif 10'lu | | |
+Durex | Yakın Hisset Prezervatif 20'li | | |
+Durex | Yok Ötesi Ekstra Zevk 10'lu | | |
+Durex | Yok Ötesi Ultra Kaygan 10'lu | | |
+Durex | Yok Ötesi XL 10'lu | | |
+Durex | Karşılıklı Zevk 10'lu | | |
+Durex | Naturals Prezervatif 20'li | | |
+Durex | Chill Karma Paket 20'li | | |
+Durex | Naturals Pure Kayganlaştırıcı Jel 100 ml | | |
+Durex | Naturals Ekstra Hassas Kayganlaştırıcı Jel 100 ml | | |
+Durex | Extreme Kayganlaştırıcı Jel 50 ml | | |
+Durex | Play Feel Kayganlaştırıcı Jel 50 ml | | |
+Durex | Play Kiraz Aşkı Kayganlaştırıcı Jel 50 ml | | |
+Durex | Play Ekstra Hisset Kayganlaştırıcı Jel 50 ml | | |
+Durex | Aloe Vera 2'si 1 Arada Masaj Jeli 200 ml | | |
+Kotex | Ultra Hijyenik Ped Gece 6'lı | | |
+Kotex | Ultra Normal 24'lü | | |
+Kotex | Ultra Kanatlı Normal 8'li | | |
+Kotex | Ultra Uzun 7'li | | |
+Kotex | Ultra Süper Ekonomik Paket Gece 16'lı | | |
+Kotex | Young Ultra Gündüz Pedi 7'li | | |
+Kotex | Young Ultra Süper Ekonomik Paket Gündüz 22'li | | |
+Kotex | Natural Hipoalerjenik Ekstra Koruma Ped 28'li | | |
+Kotex | Active Ultra İnce Günlük Ped 16'lı | | |
+Kotex | Active Ultra İnce Günlük Ped 32'li | | |
+Kotex | Günlük Ped Normal 34'lü | | |
+Kotex | Günlük Ped Uzun 28'li | | |
+Kotex | 2in1 Günlük Ped 22'li | | |
+Kotex | Tampon Mini 16'lı | | |
+Kotex | Tampon Normal 16'lı | | |
+Kotex | Active Tampon Süper 16'lı | | |
+Kotex | Aplikatörlü Tampon Normal 8'li | | |
+Kotex | Aplikatörlü Tampon Süper 8'li | | |
+Johnson's Baby | Bebek Şampuanı 200 ml | | |
+Johnson's Baby | Bebek Şampuanı 750 ml | | |
+Johnson's Baby | Bebek Yağı 200 ml | | |
+Johnson's Baby | Bebek Yağı 500 ml | | |
+Johnson's Baby | Nemlendirici Jel Yağ 200 ml | | |
+Johnson's Baby | Cottontouch Losyon 300 ml | | |
+Johnson's Baby | Bedtime Vücut Şampuanı 500 ml | | |
+Johnson's Baby | Kids 2'si 1 Arada Şampuan ve Saç Kremi 300 ml | | |
+Babydream | Papatya Özlü Saç ve Vücut Şampuanı 500 ml | | |
+Babydream | Bebek Yıkama Jeli ve Şampuan 200 ml | | |
+Babydream | Ekstra Hassas Pişik Önleyici Krem 75 ml | | |
+Babydream | Badem Yağlı Bebek Yüz Kremi 100 ml | | |
+Babydream | Natural Badem Yağı 250 ml | | |
+Babydream | Anne Bakım Yağı 250 ml | | |
+Babydream | Göğüs Ucu Kremi 30 ml | | |
+Babydream | Göğüs Pedi 30'lu | | |
+Babydream | Çok Hassas Cilt Aloe Veralı Islak Mendil 80 Yaprak | | |
+Babydream | Bebek Yıkama Bezi 30 Adet | | |
+Babydream | Bebek Bezi 3 Beden 46'lı | | |
+Babydream | Alıştırma Külot Bezi L 10'lu | | |
+Okey | Eko Paket Prezervatif Klasik 20'li | | |
+Okey | Hisset Prezervatif 20'li | | |
+Okey | Ultra Hisset Prezervatif 10'lu | | |
+Okey | Zero Ultra 10'lu | | |
+Okey | Çifte Haz 10'lu | | |
+Okey | Rötar Geciktirici Kremli 10'lu | | |
+Okey | Ritim 20'li | | |
+Okey | Nirvana 10'lu | | |
+Okey | Nirvana Hot 10'lu | | |
+Okey | Nirvana Sens 8'li | | |
+Note Cosmetique | Mattemoist Lipstick 301 Spirit | | |
+Note Cosmetique | Mattemoist Lipstick 302 Mirage | | |
+Note Cosmetique | Mattemoist Lipstick 303 Miss Kiss | | |
+Note Cosmetique | Mattemoist Lipstick 304 Spring | | |
+Note Cosmetique | Mattemoist Lipstick 305 Show | | |
+Note Cosmetique | Mattemoist Lipstick 306 Kiss Blossom | | |
+Note Cosmetique | Mattemoist Lipgloss 403 | | |
+Note Cosmetique | Mattever Lip Stick 09 | | |
+Note Cosmetique | Mattever Lip Stick 18 | | |
+Note Cosmetique | Lipink Mattever 04 | | |
+Catrice | True Skin Hydrating Fondöten 002 Neutral Ivory | | |
+Catrice | True Skin Hydrating Fondöten 004 Neutral Porcelain | | |
+Catrice | True Skin Hydrating Fondöten 010 Cool Cashmere | | |
+Catrice | True Skin Hydrating Fondöten 020 Warm Beige | | |
+Catrice | True Skin Hydrating Fondöten 033 Cool Almond | | |
+Catrice | True Skin Hydrating Fondöten 040 Neutral Hazel | | |
+Catrice | True Skin Hydrating Fondöten 043 Neutral Macchiato | | |
+Catrice | True Skin Hydrating Fondöten 046 Neutral Toffee | | |
+Catrice | True Skin Hydrating Fondöten 094 Warm Cocoa | | |
+Catrice | True Skin Hydrating Fondöten 096 Neutral Mocca | | |
+Deborah Milano | Red Touch Ruj 04 Rose Mauve | | |
+Deborah Milano | Red Touch Ruj 05 Berry Pink | | |
+Deborah Milano | Red Touch Ruj 07 Fiery Red | | |
+Deborah Milano | Formula Pura Fluid Mat Ruj 08 Geranium | | |
+Deborah Milano | Formula Pura Likit Fondöten | | |
+Deborah Milano | Instant Lift Fondöten | | |
+Deborah Milano | All Over Kapatıcı | | |
+Deborah Milano | Like a Pro Volume Maskara | | |
+Bourjois | Rouge Edition Velvet 04 Peach Club | | |
+Bourjois | Rouge Edition Velvet 05 Olé Flamingo | | |
+Bourjois | Rouge Edition Velvet 07 Nude-ist | | |
+Bourjois | Rouge Edition Velvet 08 Grand Cru | | |
+Bourjois | Rouge Edition Velvet 12 Beau Brun | | |
+Bourjois | Rouge Edition Velvet 15 Red-volution | | |
+Bourjois | Rouge Edition Velvet 19 Jolie-De-Vin | | |
+Bourjois | Rouge Velvet The Lipstick 08 Rubi's Cute | | |
+Bourjois | Healthy Mix Fondöten 51 Light Vanilla | | |
+Bourjois | Healthy Mix Fondöten 53 Beige Clair | | |
+Bourjois | Healthy Mix Fondöten 54 Beige | | |
+Bourjois | Healthy Mix Serum Fondöten 52W Vanilla | | |
+Bourjois | Healthy Mix Clean Fondöten 50C Rose Ivory | | |
+Bourjois | Healthy Mix Tinted Beautifier 01 Fair | | |
+Bourjois | Healthy Mix Tinted Beautifier 03 Light Medium | | |
+Bourjois | Healthy Mix Tinted Beautifier 006 Deep | | |
+Bourjois | Healthy Balance Pudra 52 Vanille | | |
+Bourjois | 123 Perfect CC Krem 31 Ivory | | |
+Bourjois | Little Round Pot Allık Rose Eclat | | |
+Bourjois | Twist Up the Volume Maskara | | |
+Bourjois | Brow Fiber Oh Oui! Kaş Maskarası | | |
+`;
+function satirCoz(satir){
+  const t = satir.trim();
+  if (!t || t.startsWith("#") || t.startsWith("//")) return null;
+  const ayrac = t.includes("|") ? "|" : t.includes(";") ? ";" : "\t";
+  const [marka, ad, barkod, renk, resim] = t.split(ayrac).map(x => (x || "").trim());
+  if (!marka || !ad) return null;
+  return {
+    marka, ad,
+    barkod: /^\d{8,14}$/.test(barkod || "") ? barkod : "",
+    renk: /^#[0-9a-f]{3,8}$/i.test(renk || "") ? renk : "",
+    resim: /^(https?:\/\/|gorseller\/|data:image\/)/i.test(resim || "") ? resim : ""
+  };
+}
+EK_URUNLER.split("\n").map(satirCoz).filter(Boolean).forEach(u => URUNLER.push({...u, id:_id++}));
+/* Mağaza markaları sadece kendi zincirinde satılır */
+const OZEL = {};
+const grupla = (zincir, t) => liste(t).forEach(m => { OZEL[m] = zincir; });
+grupla("Gratis", "Gratis,Beaulis,LYKD");
+grupla("Watsons", "Watsons,Naturals by Watsons,Pure Beauty,Collagen by Watsons,Target Pro by Watsons,Dermaction Plus,Miine,Solait,Pink by Pure Beauty,Superdrug,Kruidvat,B. by Superdrug");
+grupla("Rossmann", "Isana,Rival de Loop,Rival Loves Me,Alterra,Prokudent,For Your Beauty,Wellness & Beauty,Sunozon,Babydream,Facelle,Altapharma,Domol,Flink & Sauber,Genuss Plus,Rubin,enerBiO");
+grupla("Sephora", "Sephora Collection,Rare Beauty,Fenty Beauty,Fenty Skin,Tarte,Huda Beauty,Charlotte Tilbury,Benefit Cosmetics,Milk Makeup,Anastasia Beverly Hills,Too Faced,Drunk Elephant,Sol de Janeiro,NARS,Natasha Denona,Glow Recipe,Makeup by Mario,KVD Beauty,Ole Henriksen,Supergoop!,Mario Badescu,Fable & Mane,Ouai,Gisou");
+grupla("Eve", "Eve");
+
+/* ========== MARKA -> MAĞAZA EŞLEME TABLOSU ==========
+   Bir markanın hangi zincirlerde listeleneceği. Burayı kendin düzenleyebilirsin.
+   Tabloda olmayan markalar için en alttaki varsayılan kurallar çalışır. */
+const MARKA_ZINCIR = {
+  /* Her satır mağaza sitelerinde (gratis.com, watsons.com.tr, rossmann.com.tr, eveshop.com.tr) görülerek doğrulandı.
+     Boş liste [] = bu zincirlerin hiçbirinde bulunamadı (ör. eczane veya doğrudan satış markası). */
+  "Maybelline":["Gratis","Watsons","Rossmann","Eve"],
+  "L'Oréal Paris":["Gratis","Watsons","Rossmann","Eve"],
+  "Flormar":["Gratis","Watsons","Rossmann","Eve","Flormar"],
+  "Golden Rose":["Gratis","Watsons","Rossmann","Eve","Golden Rose"],
+  "Note Cosmetique":["Gratis","Watsons","Rossmann","Eve"],
+  "Pastel":["Gratis","Watsons","Rossmann","Eve"],
+  "Essence":["Gratis","Watsons","Rossmann","Eve"],
+  "Sheglam":["Gratis"],
+  "Emily":["Gratis"],
+  "The Bath Factory":["Gratis"],
+  "Bourjois":["Gratis"],
+  "NYX":["Watsons"],
+  "Revolution":["Watsons"],
+  "Deborah Milano":["Watsons"],
+  "Bioderma":["Watsons"],
+  "Catrice":["Rossmann"],
+  "Cetaphil":["Rossmann"],
+  "Kiko Milano":["Kiko Milano"],
+  "Technic":["Eve"],
+  "Wibo":["Eve"],
+  "Neutrogena":["Gratis","Watsons","Rossmann","Eve"],
+  "Ipana":["Watsons","Rossmann"],
+  "Glade":["Gratis","Rossmann"],
+  "Domestos":["Watsons","Rossmann","Eve"],
+  "Axe":["Gratis","Watsons","Rossmann","Eve"],
+  "Old Spice":["Gratis","Watsons","Rossmann","Eve"],
+  "Gillette":["Gratis","Watsons","Rossmann","Eve"],
+  "Arko Men":["Gratis","Watsons","Rossmann","Eve"],
+  "Blade":["Gratis","Watsons","Rossmann","Eve"],
+  "Durex":["Gratis","Watsons","Rossmann","Eve"],
+  "Okey":["Gratis","Watsons","Rossmann","Eve"],
+  "Colgate":["Gratis","Watsons","Rossmann","Eve"],
+  "Duru":["Gratis","Watsons","Rossmann","Eve"],
+  "Duracell":["Gratis","Watsons","Rossmann"],
+  "Benri":["Gratis"],
+  "Tarte":["Sephora"],
+  "The Ordinary":["Sephora"],
+  "Laneige":["Sephora"],
+  "Byoma":["Sephora"],
+  "La Roche-Posay":[],
+  "CeraVe":[],
+  "Farmasi":[],
+  "Pupa Milano":[],
+  "Brut":[]
+};
+const GENEL = ["Gratis","Watsons","Rossmann"];
+const LUKS = liste("Clinique,Estée Lauder,Lancôme,Dior,MAC Cosmetics,Bobbi Brown,Smashbox,Kiehl's,Jo Malone London");
+function zincirler(marka){
+  if (!marka) return ["Gratis","Watsons","Rossmann","Sephora","Eve","Flormar","Golden Rose","Kiko Milano"];   // serbest arama: kısıtlama yok
+  if (MARKA_ZINCIR[marka]) return MARKA_ZINCIR[marka];
+  if (OZEL[marka]) return [OZEL[marka]];                                // mağaza markaları
+  if (LUKS.includes(marka)) return ["Sephora"];                         // seçici/lüks markalar
+  if (TUR[marka] === "parfum") return ["Gratis","Watsons","Sephora"];
+  if (TUR[marka] === "kozmetik") return [...GENEL, "Eve"];
+  return GENEL;                                                         // ev, pil, gıda gibi kozmetik dışı markalar
+}
+
+/* ========== 2) YARDIMCI ==========
+   Not: Uydurma mağaza konumu yok. Mağazalar sadece OpenStreetMap'teki gerçek kayıtlardan gelir. */
+const seed = (a, b) => { const x = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return x - Math.floor(x); };
+
+/* ========== 3) STOK KAYNAĞI (adapter) ==========
+   Her zincir için ayrı bir bağlayıcı var. Şu an hepsi örnek veri üretiyor.
+   Gerçek hayatta sadece bu fonksiyonların içi değişir (zincirin API'si veya kullanıcı bildirimleri). */
+function ornekStok(urun, magaza){
+  const r = seed(urun.id, magaza.id % 100000);
+  return r < 0.3 ? 0 : Math.ceil((r - 0.3) * 14);
+}
+const KAYNAKLAR = {Gratis:ornekStok, Watsons:ornekStok, Rossmann:ornekStok, Sephora:ornekStok, Flormar:ornekStok, "Golden Rose":ornekStok, "Kiko Milano":ornekStok, Eve:ornekStok};
+function stokGetir(urun, magaza){
+  if (!zincirler(urun.marka).includes(magaza.zincir)) return null;   // bu markanın bu zincirde satılmadığı varsayılıyor
+  return KAYNAKLAR[magaza.zincir](urun, magaza);
+}
+
+/* ========== 4) GERÇEK MAĞAZA KONUMLARI: OpenStreetMap (Overpass API) ========== */
+const ZINCIR = [["Gratis",/gratis/i],["Watsons",/watsons/i],["Rossmann",/rossmann/i],["Sephora",/sephora/i],["Flormar",/^flormar/i],["Golden Rose",/^golden (rose|shop)/i],["Kiko Milano",/^kiko/i],["Eve",/^eve(\s+(shop|kozmetik)\b.*)?$/i]];
+const OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter", "https://overpass.kumi.systems/api/interpreter"];
+let HATA_NOTLARI = [];
+/* ================= GOOGLE MAĞAZA ARAMASI (İSTEĞE BAĞLI) =================
+   Google Cloud'dan aldığın "Places API (New)" anahtarını tırnakların arasına yapıştır.
+   Boş bırakırsan site sadece OpenStreetMap ile çalışır.
+   Anahtarı mutlaka sadece https://zynpsn.github.io/* adresinde çalışacak şekilde kısıtla. */
+const GOOGLE_API_KEY = "";
+
+/* ================= TOMTOM MAĞAZA ARAMASI (İSTEĞE BAĞLI, KREDİ KARTI GEREKMEZ) =================
+   developer.tomtom.com'dan aldığın anahtarı tırnakların arasına yapıştır. Boş bırakırsan kullanılmaz.
+   Her aramada 5 istek yapılır (her zincir için bir tane). Ücretsiz aylık hak bitince site OpenStreetMap'e döner. */
+const TOMTOM_API_KEY = "DZffD8tqOeVTM0Mpku7pCuQqAYi64vGh";
+async function tomtomMagazalar(lat, lng){
+  const aramalar = [["Gratis","Gratis"],["Watsons","Watsons"],["Rossmann","Rossmann"],["Sephora","Sephora"],["Eve","Eve Shop"],["Flormar","Flormar"],["Golden Rose","Golden Rose"],["Kiko Milano","KIKO Milano"]];
+  const liste = [], gorulen = new Set();
+  await Promise.all(aramalar.map(async ([zincir, sorgu]) => {
+    try {
+      const url = "https://api.tomtom.com/search/2/poiSearch/" + encodeURIComponent(sorgu) + ".json?key=" + encodeURIComponent(TOMTOM_API_KEY)
+        + "&lat=" + lat + "&lon=" + lng + "&radius=50000&limit=100&countrySet=TR&language=" + (DIL === "tr" ? "tr-TR" : "en-GB");
+      const res = await fetch(url, {signal: AbortSignal.timeout(15000)});
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const v = await res.json();
+      const re = ZINCIR.find(([z]) => z === zincir)[1];
+      (v.results || []).forEach(r => {
+        const ad = (r.poi && r.poi.name) || "";
+        if (r.type !== "POI" || /otopark|park yeri|sokak|sokağı|cadde|bulvar|durak|eczane/i.test(ad)) return;
+        if (!r.position || !re.test(ad) || /collection/i.test(ad)) return;
+        const la = r.position.lat, lo = r.position.lon, anahtar = zincir + la.toFixed(3) + lo.toFixed(3);
+        if (gorulen.has(anahtar)) return; gorulen.add(anahtar);
+        const a = r.address || {};
+        liste.push({id:hash(r.id || anahtar), zincir, ad, adres:a.streetName ? [a.streetName, a.streetNumber].filter(Boolean).join(" ") : (a.freeformAddress || ""),
+          bolge:a.municipalitySubdivision || a.municipality || "", lat:la, lng:lo});
+      });
+    } catch (e) { HATA_NOTLARI.push("tomtom/" + zincir + ": " + (e.name === "TimeoutError" ? "timeout" : e.message)); }
+  }));
+  return liste;
+}
+async function googleMagazalar(lat, lng){
+  const aramalar = [["Gratis","Gratis"],["Watsons","Watsons"],["Rossmann","Rossmann"],["Sephora","Sephora"],["Eve","Eve Shop kozmetik"]];
+  const liste = [], gorulen = new Set();
+  await Promise.all(aramalar.map(async ([zincir, sorgu]) => {
+    try {
+      const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
+        method:"POST", signal: AbortSignal.timeout(15000),
+        headers:{"Content-Type":"application/json", "X-Goog-Api-Key":GOOGLE_API_KEY,
+                 "X-Goog-FieldMask":"places.id,places.displayName,places.formattedAddress,places.location"},
+        body: JSON.stringify({textQuery:sorgu, pageSize:20, languageCode:DIL,
+                 locationBias:{circle:{center:{latitude:lat, longitude:lng}, radius:50000}}})
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const v = await res.json();
+      const re = ZINCIR.find(([z]) => z === zincir)[1];
+      (v.places || []).forEach(pl => {
+        const ad = (pl.displayName && pl.displayName.text) || "";
+        if (!pl.location || !re.test(ad) || /collection/i.test(ad)) return;
+        const la = pl.location.latitude, lo = pl.location.longitude;
+        if (km({lat, lng}, {lat:la, lng:lo}) > 60) return;          // çok uzaktaki sonuçları at
+        const anahtar = zincir + la.toFixed(3) + lo.toFixed(3);
+        if (gorulen.has(anahtar)) return; gorulen.add(anahtar);
+        liste.push({id:hash(pl.id || anahtar), zincir, ad, adres:(pl.formattedAddress || "").split(",").slice(0, 2).join(","), bolge:"", lat:la, lng:lo});
+      });
+    } catch (e) { HATA_NOTLARI.push("google/" + zincir + ": " + (e.name === "TimeoutError" ? "timeout" : e.message)); }
+  }));
+  return liste;
+}
+/* Yedek kaynak: Nominatim (OpenStreetMap arama servisi). Her zincir adını konumun çevresinde tek tek arar.
+   Kullanım kuralı gereği istekler arasında 1 saniye beklenir. */
+async function nominatimMagazalar(lat, lng){
+  const d = 0.45, kutu = [lng - d, lat + d, lng + d, lat - d].join(",");
+  const aramalar = [["Gratis","Gratis"],["Watsons","Watsons"],["Rossmann","Rossmann"],["Sephora","Sephora"],["Eve","Eve Shop"],["Flormar","Flormar"],["Golden Rose","Golden Rose"],["Kiko Milano","KIKO Milano"]];
+  const liste = [], gorulen = new Set();
+  for (let i = 0; i < aramalar.length; i++) {
+    const [zincir, sorgu] = aramalar[i];
+    if (i) await new Promise(r => setTimeout(r, 1100));
+    try {
+      const url = "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=40&bounded=1&accept-language=tr&viewbox=" + kutu + "&q=" + encodeURIComponent(sorgu);
+      const res = await fetch(url, {signal: AbortSignal.timeout(15000)});
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      (await res.json()).forEach(e => {
+        const ad = e.name || (e.display_name || "").split(",")[0];
+        if (e.category !== "shop") return;
+        const re = ZINCIR.find(([z]) => z === zincir)[1];
+        if (!re.test(ad) || /collection/i.test(ad)) return;
+        const la = +e.lat, lo = +e.lon, anahtar = zincir + la.toFixed(3) + lo.toFixed(3);
+        if (gorulen.has(anahtar)) return; gorulen.add(anahtar);
+        const parca = (e.display_name || "").split(",").map(x => x.trim());
+        liste.push({id:Number(e.place_id) || Math.round(la * 1e5 + lo * 1e3), zincir, ad, adres:parca.slice(1, 3).join(", "), bolge:"", lat:la, lng:lo});
+      });
+    } catch (e) { HATA_NOTLARI.push("nominatim/" + zincir + ": " + (e.name === "TimeoutError" ? "timeout" : e.message)); }
+  }
+  return liste;
+}
+async function osmMagazalar(lat, lng, r){
+  /* Önce sadece dükkânları (shop) alıp sonra adına/markasına bakmak, bütün haritada ad aramaktan çok daha hızlı */
+  const q = `[out:json][timeout:25];nwr["shop"](around:${r},${lat},${lng})->.s;(`
+    + `nwr.s["name"~"Gratis|Watsons|Rossmann|Sephora|^Eve (Shop|Kozmetik)",i];`
+    + `nwr.s["name"~"^Eve$",i]["shop"~"cosmetics|chemist|perfumery|beauty"];`
+    + `nwr.s["brand"~"Gratis|Watsons|Rossmann|Sephora",i];`
+    + `nwr.s["brand"~"^Eve( Shop)?$",i]["shop"~"cosmetics|chemist|perfumery|beauty"];`
+    + `nwr.s["name"~"^(Flormar|Golden Rose|Golden Shop|Kiko)",i];`
+    + `nwr.s["brand"~"^(Flormar|Golden Rose|KIKO Milano)$",i];`
+    + `);out center qt 400;`;
+  let veri = null, hata = null;
+  for (const u of OVERPASS) {
+    try {
+      const res = await fetch(u, {method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:"data=" + encodeURIComponent(q), signal: AbortSignal.timeout(30000)});
+      if (!res.ok) throw new Error("Overpass " + res.status);
+      const v = await res.json();
+      /* Overpass zaman aşımında bile 200 + boş liste döner; bunu hata say ve sonraki sunucuyu dene */
+      if (v.remark && /error|timed out|timeout|memory/i.test(v.remark)) throw new Error("Overpass: " + v.remark);
+      veri = v; break;
+    } catch (e) { hata = e; HATA_NOTLARI.push(u.split("/")[2] + ": " + (e.name === "TimeoutError" ? "timeout" : e.message)); console.warn("Overpass sunucusu başarısız:", u, e.message); }
+  }
+  if (!veri) throw hata;
+  const gorulen = new Set(), liste = [];
+  veri.elements.forEach(e => {
+    const t = e.tags || {}, ad = t.name || t.brand || "";
+    const z = ZINCIR.find(([, re]) => re.test(ad)) || ZINCIR.find(([, re]) => re.test(t.brand || ""));
+    const la = e.lat ?? (e.center && e.center.lat), lo = e.lon ?? (e.center && e.center.lon);
+    if (!z || la == null || lo == null || /collection/i.test(ad)) return;
+    const anahtar = z[0] + la.toFixed(3) + lo.toFixed(3);
+    if (gorulen.has(anahtar)) return;
+    gorulen.add(anahtar);
+    liste.push({
+      id:e.id, zincir:z[0], ad,
+      adres:[t["addr:street"], t["addr:housenumber"]].filter(Boolean).join(" "),
+      bolge:t["addr:suburb"] || t["addr:district"] || t["addr:city"] || "",
+      lat:la, lng:lo
+    });
+  });
+  return liste;
+}
+
+/* ========== 5) YARDIMCILAR ========== */
+const $ = id => document.getElementById(id);
+const norm = s => s.toLocaleLowerCase("tr").replace(/[^\p{L}\p{N} ]/gu, " ").replace(/\s+/g, " ").trim();
+const tamAd = u => u.tam || (u.marka + " " + u.ad);
+function km(a, b){
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+  const h = Math.sin(dLat/2)**2 + Math.cos(a.lat*rad) * Math.cos(b.lat*rad) * Math.sin(dLng/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+/* ---- HARİTA ----
+   Sayfa açılır açılmaz Google Haritalar görünümü gösterilir (hiçbir kütüphane gerektirmez).
+   Arka planda Leaflet haritası hazırlanır; ilk harita görüntüsü gerçekten yüklendiğinde
+   Leaflet görünür olur (mağazalar renkli işaretlerle gösterilir). Yüklenemezse Google Haritalar kalır. */
+const MAP_EL = document.getElementById("map");
+MAP_EL.style.position = "relative"; MAP_EL.style.overflow = "hidden";
+MAP_EL.innerHTML = '<iframe id="gmap" title="Mağaza haritası" style="position:absolute;inset:0;width:100%;height:100%;border:0;display:block" referrerpolicy="no-referrer-when-downgrade"></iframe><div id="lmap" style="position:absolute;inset:0;visibility:hidden"></div>';
+const GMAP = document.getElementById("gmap"), LMAP = document.getElementById("lmap");
+const H_DURUM = document.getElementById("haritaDurum");
+let sonHDurum = ["hBaslat", null];
+const hDurum = (k, v) => {
+  sonHDurum = [k, v];
+  let vv = v;
+  if (v && v.neden) vv = {n: Array.isArray(v.neden) ? T(v.neden[0], v.neden[1]) : T(v.neden)};
+  if (H_DURUM) H_DURUM.textContent = T("hDurumOn") + T(k, vv);
+};
+function gomuluHarita(lat, lng, z){
+  const src = "https://maps.google.com/maps?q=" + lat + "," + lng + "&z=" + z + "&hl=" + DIL + "&output=embed";
+  if (GMAP.src !== src) GMAP.src = src;
+}
+gomuluHarita(39, 35, 5);
+hDurum("hGoogleHazir");
+const KARO_KAYNAKLARI = [
+  {ad:"OpenStreetMap", url:"https://tile.openstreetmap.org/{z}/{x}/{y}.png", sec:{maxZoom:19, attribution:"© OpenStreetMap katkıcıları"}},
+  {ad:"Esri", url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", sec:{maxZoom:19, attribution:"Tiles © Esri"}},
+  {ad:"OpenStreetMap HOT", url:"https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", sec:{subdomains:"abc", maxZoom:19, attribution:"© OpenStreetMap katkıcıları, HOT"}}
+];
+let konum = null;        // {lat, lng, gercek}
+let HARITA_YOK = false, lh = null, karo = null, katman = null, LEAFLET_ACIK = false;
+/* Sitenin geri kalanı sadece bu nesneyi kullanır: komutlar hem Google görünümüne hem (varsa) Leaflet'e gider */
+const harita = {
+  setView(m, z){ googleHarita.setView(m, z); if (lh && !HARITA_YOK) lh.setView(m, z); return this; },
+  fitBounds(n, o){ googleHarita.fitBounds(n); if (lh && !HARITA_YOK) lh.fitBounds(n, o); return this; },
+  invalidateSize(){ if (lh && !HARITA_YOK) lh.invalidateSize(); }
+};
+/* Google Haritalar modunda kullanılan, Leaflet ile aynı adlı küçük nesne */
+const googleHarita = {
+  setView(m, z){ gomuluHarita(m[0], m[1], z || 14); return this; },
+  fitBounds(noktalar){
+    if (!noktalar || !noktalar.length) return this;
+    const n = konum ? [konum.lat, konum.lng] : noktalar[0];
+    gomuluHarita(n[0], n[1], 13); return this;
+  },
+  invalidateSize(){}, removeLayer(){}, remove(){}
+};
+function googleYedegineGec(neden){
+  if (HARITA_YOK) return;
+  HARITA_YOK = true; LEAFLET_ACIK = false;
+  try { if (lh) lh.remove(); } catch (e) {}
+  lh = null;
+  LMAP.style.visibility = "hidden"; GMAP.style.display = "block";
+  const isaret = () => ({addTo(){ return this; }, bindPopup(){ return this; }, bindTooltip(){ return this; }, openPopup(){}});
+  const grup = () => ({addTo(){ return this; }, clearLayers(){}});
+  window.L = {circleMarker:isaret, marker:isaret, layerGroup:grup};
+  katman = grup();
+  if (konum) gomuluHarita(konum.lat, konum.lng, 13);
+  hDurum("hGoogle", {neden});
+}
+function leafletiGoster(ad){
+  if (LEAFLET_ACIK || HARITA_YOK) return;
+  LEAFLET_ACIK = true;
+  LMAP.style.visibility = "visible"; GMAP.style.display = "none";
+  lh.invalidateSize();
+  hDurum("hCalisiyor", {ad});
+}
+function leafletCssKontrol(){
+  const pane = LMAP.querySelector(".leaflet-pane");
+  if (pane && getComputedStyle(pane).position !== "absolute") {
+    const l = document.createElement("link"); l.rel = "stylesheet";
+    l.href = "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(l);
+  }
+}
+if (typeof L === "undefined" || !L.map) {
+  googleYedegineGec("nLib");
+} else {
+  try {
+    lh = L.map(LMAP, {zoomControl:true}).setView([39, 35], 6);
+    leafletCssKontrol();
+    let sira = 0, hata = 0;
+    const karoKur = () => {
+      if (HARITA_YOK) return;
+      if (karo) lh.removeLayer(karo);
+      const k = KARO_KAYNAKLARI[sira];
+      karo = L.tileLayer(k.url, k.sec).addTo(lh);
+      hata = 0;
+      karo.on("tileload", () => leafletiGoster(k.ad));
+      karo.on("tileerror", () => {
+        if (++hata === 3 && !LEAFLET_ACIK) {
+          if (sira < KARO_KAYNAKLARI.length - 1) { sira++; karoKur(); }
+          else googleYedegineGec("nEngel");
+        }
+      });
+    };
+    karoKur();
+    window.sonrakiKaro = () => { sira = (sira + 1) % KARO_KAYNAKLARI.length; LEAFLET_ACIK = false; karoKur(); hDurum("hDeneniyor", {ad: KARO_KAYNAKLARI[sira].ad}); };
+    setTimeout(() => { if (!LEAFLET_ACIK && sira < KARO_KAYNAKLARI.length - 1) { sira++; karoKur(); } }, 5000);
+    setTimeout(() => { if (!LEAFLET_ACIK) googleYedegineGec("nGelmedi"); }, 10000);
+    katman = L.layerGroup().addTo(lh);
+    const boyutla = () => { if (lh && !HARITA_YOK) lh.invalidateSize(); };
+    setTimeout(boyutla, 300); window.addEventListener("load", boyutla);
+    if (window.ResizeObserver) new ResizeObserver(boyutla).observe(MAP_EL);
+  } catch (e) {
+    console.error("Harita başlatılamadı:", e);
+    googleYedegineGec(["nHata", {m: e.message}]);
+  }
+}
+
+document.getElementById("googleBtn").onclick = () => { HARITA_YOK ? hDurum("hZaten") : googleYedegineGec("nElle"); };
+document.getElementById("karoBtn").onclick = () => { if (!HARITA_YOK && window.sonrakiKaro) window.sonrakiKaro(); else hDurum("hYuklenemedi"); };
+let magazalar = null;    // o konum için yüklenen mağazalar
+let kaynak = "";         // "osm" | "ornek"
+let seciliUrun = null;
+const esc = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const RESMI = [["Gratis","https://www.gratis.com"],["Watsons","https://www.watsons.com.tr"],["Rossmann","https://www.rossmann.com.tr"],["Sephora","https://www.sephora.com.tr"],["Eve","https://www.eveshop.com.tr"],["Flormar","https://www.flormar.com.tr"],["Kiko Milano","https://www.kikomilano.com.tr"]];
+function yokMesaji(ul){
+  $("durum").textContent = (kaynak === "hata" ? T("osmYok") : T("magazaYok")) + (HATA_NOTLARI.length ? " [" + HATA_NOTLARI.slice(0, 6).join(" | ") + "]" : "");
+  const li = document.createElement("li");
+  li.append(T("resmiSiteler"));
+  RESMI.forEach(([ad, url], i) => {
+    const a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener"; a.textContent = ad;
+    li.append(i ? ", " : "", a);
+  });
+  $("liste").appendChild(li);
+}
+
+IL.forEach(il => { const o = document.createElement("option"); o.value = il.ad; o.textContent = il.ad; $("il").appendChild(o); });
+
+/* ========== 6) KONUM ========== */
+function konumAl(){
+  return new Promise(resolve => {
+    if (!navigator.geolocation) return resolve(false);
+    navigator.geolocation.getCurrentPosition(
+      p => { konum = {lat:p.coords.latitude, lng:p.coords.longitude, gercek:true}; magazalar = null; resolve(true); },
+      () => resolve(false),
+      {timeout:12000, maximumAge:60000}
+    );
+  });
+}
+/* Bütün kaynakları birlikte kullan: TomTom / Google (anahtar varsa) + OpenStreetMap aynı anda sorgulanır,
+   sonuçlar birleştirilir. Aynı zincirin 250 m'den yakın iki kaydı aynı mağaza sayılır. */
+let KAYNAK_ADLARI = [];
+function birlestir(hedef, yeni, ad){
+  let eklendi = 0;
+  yeni.forEach(m => {
+    if (hedef.some(x => x.zincir === m.zincir && km(x, m) < 0.25)) return;
+    hedef.push(m); eklendi++;
+  });
+  if (eklendi && !KAYNAK_ADLARI.includes(ad)) KAYNAK_ADLARI.push(ad);
+}
+async function magazalariYukle(){
+  if (magazalar && magazalar.length) return;   // boş sonuç saklanmaz, bir sonraki aramada yeniden denenir
+  $("durum").textContent = T("magazaAraniyor");
+  magazalar = []; kaynak = "osm"; HATA_NOTLARI = []; KAYNAK_ADLARI = [];
+  let osmHata = null;
+  const isler = [
+    TOMTOM_API_KEY ? tomtomMagazalar(konum.lat, konum.lng) : Promise.resolve([]),
+    GOOGLE_API_KEY ? googleMagazalar(konum.lat, konum.lng) : Promise.resolve([]),
+    osmMagazalar(konum.lat, konum.lng, 50000).catch(e => { osmHata = e; return []; })
+  ];
+  const [t, g, o] = await Promise.all(isler);
+  birlestir(magazalar, t, "TomTom");
+  birlestir(magazalar, g, "Google Maps");
+  birlestir(magazalar, o, "OpenStreetMap");
+  if (magazalar.length < 3) {
+    $("durum").textContent = T("yedekAraniyor");
+    birlestir(magazalar, await nominatimMagazalar(konum.lat, konum.lng), "OpenStreetMap (Nominatim)");
+  }
+  if (!magazalar.length && (osmHata || HATA_NOTLARI.length)) kaynak = "hata";
+}
+async function hazirla(){
+  if (!konum) {
+    $("durum").textContent = T("konumIstek");
+    const ok = await konumAl();
+    if (!ok) { $("durum").textContent = T("konumYok"); return false; }
+  }
+  await magazalariYukle();
+  return true;
+}
+
+/* ========== 7) ARAMA ========== */
+const hash = t => { let h = 7; for (const c of t) h = (h * 31 + c.charCodeAt(0)) % 100003; return h + 1000; };
+function ozelUrun(q0){
+  const marka = Object.keys(OZEL).find(k => norm(q0).includes(norm(k))) || "";
+  return {id:hash(norm(q0)), marka, ad:q0, tam:q0};
+}
+function gorselKutusu(u){
+  const kutu = document.createElement("div"); kutu.className = "gorsel";
+  const yedek = () => {
+    kutu.innerHTML = ""; kutu.style.background = u.renk || "";
+    kutu.textContent = u.renk ? "" : (u.marka || u.ad || "?").trim().charAt(0).toUpperCase();
+  };
+  if (u.resim) {
+    const im = document.createElement("img");
+    im.alt = tamAd(u); im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+    im.onerror = yedek; im.src = u.resim; kutu.appendChild(im);
+  } else yedek();
+  return kutu;
+}
+function urunKartiGoster(u){
+  const k = $("urunKart"); k.innerHTML = "";
+  const metin = document.createElement("div");
+  const ad = document.createElement("b"); ad.textContent = gorunenAd(tamAd(u));
+  const alt = document.createElement("small"); alt.textContent = u.marka || "";
+  metin.append(ad, alt);
+  if (u.barkod || u.renk) {
+    const r = document.createElement("small");
+    if (u.renk) { const sp = document.createElement("span"); sp.className = "rozet"; const i = document.createElement("i"); i.style.background = u.renk; sp.append(i, T("renkRozet") + u.renk); r.append(sp); }
+    if (u.barkod) { const sp = document.createElement("span"); sp.className = "rozet"; sp.textContent = T("barkodRozet") + u.barkod; r.append(sp); }
+    metin.append(r);
+  }
+  k.append(gorselKutusu(u), metin);
+}
+function chipEkle(metin, tikla, vurgu, resim){
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = gorunenAd(metin);
+  if (resim) {
+    const im = document.createElement("img");
+    im.src = resim; im.alt = ""; im.width = 28; im.height = 28; im.referrerPolicy = "no-referrer";
+    im.style.objectFit = "contain"; im.onerror = () => im.remove(); b.prepend(im);
+  }
+  if (vurgu) b.style.borderColor = "var(--lip)";
+  b.onclick = tikla;
+  $("secim").appendChild(b);
+}
+let aramaNo = 0;
+/* Open Beauty Facts: açık kozmetik ürün veritabanından canlı öneriler (kapsamı sınırlı olabilir) */
+async function obfEkle(q0, no){
+  try {
+    const url = "https://world.openbeautyfacts.org/cgi/search.pl?search_simple=1&action=process&json=1&page_size=12&fields=product_name,brands,image_front_small_url&search_terms=" + encodeURIComponent(q0);
+    const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+    const v = await r.json();
+    if (no !== aramaNo) return;
+    const gorulen = new Set();
+    (v.products || []).forEach(p => {
+      const ad = (p.product_name || "").trim(), marka = (p.brands || "").split(",")[0].trim();
+      const tam = (marka && !ad.toLowerCase().includes(marka.toLowerCase()) ? marka + " " : "") + ad;
+      if (!ad || gorulen.has(tam)) return;
+      gorulen.add(tam);
+      const resim = p.image_front_small_url || "";
+      chipEkle(tam, () => { $("q").value = tam; goster({id:hash(norm(tam)), marka:"", ad:tam, tam, resim}); }, false, resim);
+    });
+  } catch (e) { /* ağ yoksa sadece yerel katalog ve serbest arama kalır */ }
+}
+
+let oneriZamani;
+function oneriGoster(){
+  clearTimeout(oneriZamani);
+  oneriZamani = setTimeout(() => {
+    const q = norm($("q").value);
+    if (q.length < 2) { $("secim").innerHTML = ""; return; }
+    const k = q.split(" ");
+    const bulunan = URUNLER.filter(u => { const a = norm(tamAd(u)); return k.every(w => icerir(a, w)); }).sort((x, y) => (x.ad === "(tüm ürünler)") - (y.ad === "(tüm ürünler)") || tamAd(x).localeCompare(tamAd(y), "tr", {numeric: true})).slice(0, 40);
+    $("secim").innerHTML = "";
+    bulunan.forEach(u => chipEkle(tamAd(u), () => { $("q").value = gorunenAd(tamAd(u)); goster(u); }, false, u.resim));
+  }, 150);
+}
+async function barkodAra(kod, no){
+  $("durum").textContent = T("barkodAraniyor");
+  try {
+    const r = await fetch("https://world.openbeautyfacts.org/api/v2/product/" + kod + ".json?fields=product_name,brands,image_front_small_url", {signal: AbortSignal.timeout(8000)});
+    const v = await r.json();
+    if (no !== aramaNo) return;
+    if (v.status === 1 && v.product && v.product.product_name) {
+      const p = v.product, marka = (p.brands || "").split(",")[0].trim();
+      const ad = p.product_name.trim(), tam = (marka && !ad.toLowerCase().includes(marka.toLowerCase()) ? marka + " " : "") + ad;
+      await goster({id:hash(kod), marka:"", ad:tam, tam, resim:p.image_front_small_url || ""});
+      return;
+    }
+  } catch (e) { /* ağ yok */ }
+  if (no === aramaNo) $("durum").textContent = T("barkodYok");
+}
+async function ara(){
+  const q0 = $("q").value.trim(), q = norm(q0), no = ++aramaNo;
+  $("secim").innerHTML = "";
+  if (!q) { $("durum").textContent = T("bosArama"); return; }
+  const kelimeler = q.split(" ");
+  const bulunan = URUNLER.filter(u => { const a = norm(tamAd(u)); return kelimeler.every(k => icerir(a, k)); }).sort((x, y) => (x.ad === "(tüm ürünler)") - (y.ad === "(tüm ürünler)") || tamAd(x).localeCompare(tamAd(y), "tr", {numeric: true}));
+  const tam = bulunan.find(u => norm(tamAd(u)) === q);
+  if (bulunan.length === 1 || tam) { await goster(tam || bulunan[0]); return; }
+  $("durum").textContent = bulunan.length ? T("urunBulundu", {n: bulunan.length}) : T("urunYok");
+  bulunan.slice(0, 60).forEach(u => chipEkle(tamAd(u), () => { $("q").value = gorunenAd(tamAd(u)); goster(u); }, false, u.resim));
+  chipEkle(T("olarakAra", {q: q0}), () => goster(ozelUrun(q0)), true);
+  obfEkle(q0, no);
+}
+
+async function goster(urun){
+  seciliUrun = urun; aramaNo++;
+  urunKartiGoster(urun);
+  $("secim").innerHTML = "";
+  if (!(await hazirla())) return;
+  let liste = magazalar
+    .map(m => ({m, adet: stokGetir(urun, m), mesafe: km(konum, m)}))
+    .filter(x => x.adet !== null);
+  if ($("sadece").checked) liste = liste.filter(x => x.adet > 0);
+  liste.sort((a, b) => a.mesafe - b.mesafe);
+  liste = liste.slice(0, 10);
+
+  $("kaynak").textContent = T("kaynakNotX", {k: KAYNAK_ADLARI.join(" + ") || "OpenStreetMap"});
+  katman.clearLayers();
+  const ul = $("liste"); ul.innerHTML = "";
+  if (urun.marka && !zincirler(urun.marka).length) { $("durum").textContent = T("zincirYok", {u: gorunenAd(tamAd(urun))}); return; }
+  if (magazalar.length === 0) { harita.setView([konum.lat, konum.lng], 12); yokMesaji(ul); return; }
+  if (liste.length === 0) {
+    $("durum").textContent = T("listeYok", {u: gorunenAd(tamAd(urun))});
+    ul.innerHTML = "<li>" + esc(T("sonucYok")) + "</li>"; return;
+  }
+  const stokta = liste.filter(x => x.adet > 0).length;
+  $("durum").textContent = T("ozet", {u: gorunenAd(tamAd(urun)), n: liste.length, s: stokta});
+
+  const noktalar = [];
+  if (konum.gercek) {
+    L.circleMarker([konum.lat, konum.lng], {radius:8, color:"#fff", weight:2, fillColor:"#2a1a2e", fillOpacity:1}).addTo(katman).bindTooltip(T("senBurada"));
+    noktalar.push([konum.lat, konum.lng]);
+  }
+  liste.forEach(({m, adet, mesafe}) => {
+    const sinif = adet === 0 ? "" : adet <= 3 ? "low" : "ok";
+    const renk = adet === 0 ? "#8b8190" : adet <= 3 ? "#c97a14" : "#237a55";
+    const etiket = adet === 0 ? T("stoktaYok") : adet <= 3 ? T("azKaldi") : T("stoktaVar");
+    const baslik = new RegExp(m.zincir, "i").test(m.ad) ? m.ad : `${m.zincir} ${m.ad}`;
+    const li = document.createElement("li");
+    li.className = "m " + sinif;
+    const b = document.createElement("b"); b.textContent = baslik;
+    const kucuk = document.createElement("small");
+    const yolUrl = `https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lng}`;
+    const yer = [m.adres, m.bolge].filter(Boolean).join(", ");
+    kucuk.textContent = `${yer ? yer + " · " : ""}${mesafe < 10 ? mesafe.toFixed(1) : Math.round(mesafe)} km · `;
+    const yol = document.createElement("a"); yol.href = yolUrl; yol.target = "_blank"; yol.rel = "noopener"; yol.textContent = T("yolTarifi");
+    yol.onclick = e => e.stopPropagation();
+    kucuk.appendChild(yol);
+    const ad = document.createElement("div"); ad.className = "adet"; ad.innerHTML = `${adet}<span>${etiket}</span>`;
+    li.append(b, ad, kucuk);
+    const mk = L.circleMarker([m.lat, m.lng], {radius:10, color:"#fff", weight:2, fillColor:renk, fillOpacity:1})
+      .addTo(katman).bindPopup(`<b>${esc(baslik)}</b><br>${adet} ${T("adet")} (${etiket})<br><a href="${yolUrl}" target="_blank" rel="noopener">${T("yolTarifi")}</a>`);
+    li.onclick = () => { harita.setView([m.lat, m.lng], 15); mk.openPopup(); };
+    ul.appendChild(li);
+    noktalar.push([m.lat, m.lng]);
+  });
+  harita.fitBounds(noktalar, {padding:[40, 40], maxZoom:14});
+}
+
+/* ========== 8) OLAYLAR ========== */
+const EK_KEY = "ekUrunler";
+function ekOku(){ try { return JSON.parse(localStorage.getItem(EK_KEY) || "[]"); } catch (e) { return []; } }
+ekOku().forEach(u => URUNLER.push({...u, id:_id++}));
+function ekKaydet(liste){
+  let kayitli = true;
+  try { const l = ekOku().concat(liste); localStorage.setItem(EK_KEY, JSON.stringify(l)); } catch (e) { kayitli = false; }
+  liste.forEach(u => URUNLER.push({...u, id:_id++}));
+  const satirlar = liste.map(u => `${u.marka} | ${u.ad} | ${u.barkod} | ${u.renk} | ${u.resim.startsWith("data:") ? "" : u.resim}`).join("\n");
+  const imgNot = liste.some(u => u.resim.startsWith("data:")) ? T("resimNot") : "";
+  $("ekSatir").hidden = false;
+  $("ekSatir").textContent = (kayitli ? "" : T("depoDolu")) + T("kaliciYap") + satirlar + imgNot;
+}
+function resimKucult(dosya){
+  return new Promise(res => {
+    const fr = new FileReader();
+    fr.onload = () => {
+      const im = new Image();
+      im.onload = () => {
+        const o = Math.min(1, 360 / Math.max(im.width, im.height)), c = document.createElement("canvas");
+        c.width = Math.round(im.width * o); c.height = Math.round(im.height * o);
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        res(c.toDataURL("image/jpeg", 0.8));
+      };
+      im.onerror = () => res(""); im.src = fr.result;
+    };
+    fr.onerror = () => res(""); fr.readAsDataURL(dosya);
+  });
+}
+$("ekleForm").onsubmit = async e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const u = satirCoz([f.get("marka"), f.get("ad"), f.get("barkod"), f.get("renkVar") ? f.get("renk") : "", f.get("resim")].join("|"));
+  if (!u) return;
+  const dosya = f.get("dosya");
+  if (dosya && dosya.size) { const d = await resimKucult(dosya); if (d) u.resim = d; }
+  ekKaydet([u]);
+  $("q").value = tamAd(u); e.target.reset(); ara();
+};
+function topluEkle(metin){
+  const liste = metin.split(/\r?\n/).map(satirCoz).filter(Boolean);
+  if (!liste.length) { $("durum").textContent = T("gecersizSatir"); return; }
+  ekKaydet(liste);
+  $("durum").textContent = T("eklendi", {n: liste.length});
+  $("topluMetin").value = "";
+}
+$("topluBtn").onclick = () => topluEkle($("topluMetin").value);
+$("topluDosya").onchange = async e => { const d = e.target.files[0]; if (d) topluEkle(await d.text()); e.target.value = ""; };
+$("ara").onclick = ara;
+$("q").addEventListener("input", oneriGoster);
+$("q").addEventListener("keydown", e => { if (e.key === "Enter") ara(); });
+$("konum").onclick = async () => {
+  const ok = await konumAl();
+  if (!ok) { $("durum").textContent = T("konumYok"); return; }
+  seciliUrun ? goster(seciliUrun) : ($("durum").textContent = T("konumAlindi"));
+};
+$("il").onchange = () => {
+  const il = IL.find(x => x.ad === $("il").value);
+  if (!il) return;
+  konum = {lat:il.lat, lng:il.lng, gercek:false}; magazalar = null;
+  seciliUrun ? goster(seciliUrun) : ($("durum").textContent = T("ilSecildi", {il: il.ad}));
+};
+$("sadece").onchange = () => seciliUrun && goster(seciliUrun);
+$("temaSec").onchange = e => { TEMA = e.target.value; try { localStorage.setItem("tema", TEMA); } catch (x) {} temaUygula(); };
+$("dilSec").onchange = e => {
+  DIL = e.target.value; try { localStorage.setItem("dil", DIL); } catch (x) {}
+  dilUygula();
+  hDurum(sonHDurum[0], sonHDurum[1]);
+  if (HARITA_YOK || !LEAFLET_ACIK) { const src = GMAP.src; if (src) GMAP.src = src.replace(/hl=[a-z]+/, "hl=" + DIL); }
+  if (seciliUrun) goster(seciliUrun); else $("durum").textContent = "";
+};
+</script>
+</body>
+</html>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CosmetAI</title>
