@@ -84,6 +84,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);f
 @media(max-width:820px){.grid{grid-template-columns:1fr}#map{height:340px}#liste{max-height:none}}
 .marka{display:flex;align-items:center;gap:14px}
 .marka .logo{height:clamp(56px,10vw,88px);width:auto;flex:none}
+  <ol class="adimlar"><li data-i18n="adim1">Ürünü yaz (marka, ürün ve ton)</li><li data-i18n="adim2">Konumunu paylaş ya da ilini seç</li><li data-i18n="adim3">Yakındaki mağazaları haritada gör</li></ol>
 </style>
 </head>
 <body>
@@ -98,6 +99,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);f
   <div class="marka"><img src="cosmetai-ikon.png" alt="" class="logo"><h1 data-i18n="baslik">CosmetAI</h1></div>
   <p data-i18n="altBaslik">Türkiye'nin 81 ilinde, aradığın kozmetik ürünün Gratis, Watsons, Rossmann, Sephora ve Eve mağazalarında kaç adet olduğunu konumuna göre gör.</p>
 </header>
+  <ol class="adimlar"><li data-i18n="adim1">Ürünü yaz (marka, ürün ve ton)</li><li data-i18n="adim2">Konumunu paylaş ya da ilini seç</li><li data-i18n="adim3">Yakındaki mağazaları haritada gör</li></ol>
 
 <div class="search" role="search">
   <input type="text" id="q" placeholder="Örn: Sheglam rimel, Sephora Collection ruj" data-i18n-ph="araPh" autocomplete="off" aria-label="Ürün adı" data-i18n-aria="araAria">
@@ -152,12 +154,15 @@ const SOZLUK = {
   baslik:{tr:"CosmetAI", en:"CosmetAI"},
   gizlilik:{tr:"Gizlilik: Konumunuz yalnızca yakındaki mağazaları bulmak için harita servislerine (OpenStreetMap, TomTom) sorgu olarak gönderilir; bu site konumunuzu kaydetmez veya saklamaz.", en:"Privacy: Your location is only sent as a query to map services (OpenStreetMap, TomTom) to find nearby stores; this site does not record or store it."},
   iletisim:{tr:"Öneri ve şikayetleriniz için:", en:"Suggestions and complaints:"},
+  adim1:{tr:"Ürünü yaz (marka, ürün ve ton)", en:"Type the product (brand, product and shade)"},
+  adim2:{tr:"Konumunu paylaş ya da ilini seç", en:"Share your location or pick a province"},
+  adim3:{tr:"Yakındaki mağazaları haritada gör", en:"See nearby stores on the map"},
   altBaslik:{tr:"Türkiye'nin 81 ilinde, aradığın kozmetik ürünün Gratis, Watsons, Rossmann, Sephora ve Eve mağazalarında kaç adet olduğunu konumuna göre gör.",
              en:"Across all 81 provinces of Türkiye, see how many units of the cosmetic product you want are at Gratis, Watsons, Rossmann, Sephora and Eve stores near you."},
   sayfaBaslik:{tr:"CosmetAI", en:"CosmetAI"},
   temaEt:{tr:"Tema", en:"Theme"}, temaAuto:{tr:"Otomatik", en:"Automatic"}, temaLight:{tr:"Açık", en:"Light"}, temaDark:{tr:"Koyu", en:"Dark"},
   dilEt:{tr:"Dil", en:"Language"},
-  araPh:{tr:"Örn: Sheglam rimel, Sephora Collection ruj", en:"e.g. Maybelline mascara, NARS concealer, barcode"},
+  araPh:{tr:"Örn: Sheglam rimel, Sephora Collection ruj", en:"e.g. Maybelline mascara, NARS concealer"},
   araAria:{tr:"Ürün adı", en:"Product name"},
   araBtn:{tr:"Ara", en:"Search"}, konumBtn:{tr:"Konumumu kullan", en:"Use my location"},
   sadece:{tr:"Sadece stokta olanlar", en:"In stock only"},
