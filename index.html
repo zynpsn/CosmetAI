@@ -2116,8 +2116,11 @@ function birlestir(hedef, yeni, ad){
 }
 async function magazalariYukle(){
   if (magazalar && magazalar.length) return;   // boş sonuç saklanmaz, bir sonraki aramada yeniden denenir
+  /* Yükleme sürerken kullanıcı başka il seçerse eski ilin sonuçları yeni ile karışmasın:
+     sonuçlar önce ayrı bir listede toplanır, konum hâlâ aynıysa kullanılır. */
+  const hedefKonum = konum;
   $("durum").textContent = T("magazaAraniyor");
-  magazalar = []; kaynak = "osm"; HATA_NOTLARI = []; KAYNAK_ADLARI = [];
+  const toplanan = []; HATA_NOTLARI = []; KAYNAK_ADLARI = [];
   let osmHata = null;
   const isler = [
     TOMTOM_API_KEY ? tomtomMagazalar(konum.lat, konum.lng) : Promise.resolve([]),
@@ -2125,14 +2128,18 @@ async function magazalariYukle(){
     osmMagazalar(konum.lat, konum.lng, 50000).catch(e => { osmHata = e; return []; })
   ];
   const [t, g, o] = await Promise.all(isler);
-  birlestir(magazalar, t, "TomTom");
-  birlestir(magazalar, g, "Google Maps");
-  birlestir(magazalar, o, "OpenStreetMap");
-  if (magazalar.length < 3) {
+  if (konum !== hedefKonum) return;            // bu arada başka il/konum seçildi
+  birlestir(toplanan, t, "TomTom");
+  birlestir(toplanan, g, "Google Maps");
+  birlestir(toplanan, o, "OpenStreetMap");
+  if (toplanan.length < 3) {
     $("durum").textContent = T("yedekAraniyor");
-    birlestir(magazalar, await nominatimMagazalar(konum.lat, konum.lng), "OpenStreetMap (Nominatim)");
+    const n = await nominatimMagazalar(hedefKonum.lat, hedefKonum.lng);
+    if (konum !== hedefKonum) return;
+    birlestir(toplanan, n, "OpenStreetMap (Nominatim)");
   }
-  if (!magazalar.length && (osmHata || HATA_NOTLARI.length)) kaynak = "hata";
+  magazalar = toplanan;
+  kaynak = (!toplanan.length && (osmHata || HATA_NOTLARI.length)) ? "hata" : "osm";
 }
 async function hazirla(){
   if (!konum) {
@@ -2251,10 +2258,11 @@ async function ara(){
 }
 
 async function goster(urun){
-  seciliUrun = urun; aramaNo++;
+  seciliUrun = urun; const no = ++aramaNo;
   urunKartiGoster(urun);
   $("secim").innerHTML = "";
   if (!(await hazirla())) return;
+  if (no !== aramaNo || !magazalar) return;   // bu arada yeni bir arama/il seçimi başladı
   let liste = magazalar
     .map(m => ({m, adet: stokGetir(urun, m), mesafe: km(konum, m)}))
     .filter(x => x.adet !== null);
