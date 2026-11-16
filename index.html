@@ -108,8 +108,6 @@ footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);f
     <input name="ad" placeholder="Ürün adı ve ton (örn. Starlight Velvet Ruj 407 Flame)" data-i18n-ph="adPh" required>
     <input name="barkod" inputmode="numeric" placeholder="Barkod (isteğe bağlı, 8-14 rakam)" data-i18n-ph="barkodPh">
     <label class="renkSec"><span data-i18n="renkEt">Renk</span> <input type="color" name="renk" value="#b3124f"> <span><input type="checkbox" name="renkVar"> <span data-i18n="renkEkle">renk ekle</span></span></label>
-    <label class="renkSec"><span data-i18n="resimEt">Resim</span> <input type="file" name="dosya" accept="image/*"></label>
-    <input name="resim" placeholder="veya resim bağlantısı (https://... veya gorseller/dosya.jpg)" data-i18n-ph="resimPh">
     <button data-i18n="ekleBtn">Ekle</button>
   </form>
   <p data-i18n-html="topluAciklama"><b>Toplu ekle:</b> Her satıra bir ürün yaz: <code>Marka | Ürün adı | Barkod | Renk | Resim</code> (barkod, renk, resim boş olabilir). Excel'den kopyaladığın tabloyu da yapıştırabilirsin.</p>
@@ -130,6 +128,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);f
 
 <footer>
   <span>Bu bir ders projesi prototipidir. Mağaza konumları OpenStreetMap'ten canlı çekilir (kapsam eksik olabilir).</span>
+  <br><span data-i18n="iletisim">Öneri ve şikayetleriniz için:</span> <a href="mailto:cozmetai.iletisim@gmail.com">cosmetai.iletisim@gmail.com</a>
   <br><b>Sürüm / Version: H11 (TomTom + OSM birlikte)</b>
 </footer>
 </div>
@@ -143,6 +142,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);f
    Yeni dil eklemek için SOZLUK'e bir sütun (ör. de, ar) ekle ve #dilSec'e seçenek koy. */
 const SOZLUK = {
   baslik:{tr:"CosmetAI", en:"CosmetAI"},
+  iletisim:{tr:"Öneri ve şikayetleriniz için:", en:"Suggestions and complaints:"},
   altBaslik:{tr:"Türkiye'nin 81 ilinde, aradığın kozmetik ürünün Gratis, Watsons, Rossmann, Sephora ve Eve mağazalarında kaç adet olduğunu konumuna göre gör.",
              en:"Across all 81 provinces of Türkiye, see how many units of the cosmetic product you want are at Gratis, Watsons, Rossmann, Sephora and Eve stores near you."},
   sayfaBaslik:{tr:"CosmetAI", en:"CosmetAI"},
